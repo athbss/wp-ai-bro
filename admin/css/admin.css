@@ -1,0 +1,200 @@
+/**
+ * WordPress AI Assistant Admin Styles
+ *
+ * @since      1.0.0
+ * @package    WordPress_AI_Assistant
+ * @subpackage WordPress_AI_Assistant/admin/css
+ * @author     Amit Trabelsi <amit@amit-trabelsi.co.il>
+ */
+
+/* Admin Settings Page */
+.at-ai-assistant-admin {
+    max-width: 1200px;
+    margin: 20px 0;
+}
+
+.at-ai-assistant-header {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.at-ai-assistant-header h1 {
+    margin: 0 0 10px 0;
+    color: #23282d;
+}
+
+.at-ai-assistant-header p {
+    margin: 0;
+    color: #646970;
+}
+
+/* Tabs */
+.at-ai-assistant-tabs {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+}
+
+.at-ai-assistant-tabs .nav-tab-wrapper {
+    border-bottom: 1px solid #ccd0d4;
+    margin: 0;
+    padding: 0 20px;
+}
+
+.at-ai-assistant-tabs .nav-tab {
+    border: none;
+    border-bottom: 3px solid transparent;
+    background: none;
+    margin: 0 20px 0 0;
+    padding: 15px 0;
+}
+
+.at-ai-assistant-tabs .nav-tab-active {
+    border-bottom-color: #0073aa;
+    color: #0073aa;
+}
+
+.at-ai-assistant-tab-content {
+    padding: 20px;
+}
+
+/* Form Elements */
+.at-ai-assistant-form-table {
+    width: 100%;
+}
+
+.at-ai-assistant-form-table th {
+    width: 200px;
+    padding: 15px 10px 15px 0;
+    vertical-align: top;
+}
+
+.at-ai-assistant-form-table td {
+    padding: 15px 0;
+}
+
+.at-ai-assistant-form-table input[type="text"],
+.at-ai-assistant-form-table input[type="password"],
+.at-ai-assistant-form-table select,
+.at-ai-assistant-form-table textarea {
+    width: 100%;
+    max-width: 400px;
+}
+
+.at-ai-assistant-form-table textarea {
+    height: 100px;
+    resize: vertical;
+}
+
+/* Status Indicators */
+.at-ai-assistant-status {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.at-ai-assistant-status.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.at-ai-assistant-status.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.at-ai-assistant-status.warning {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+/* API Key Field */
+.at-ai-assistant-api-key-field {
+    position: relative;
+}
+
+.at-ai-assistant-api-key-toggle {
+    position: absolute;
+    left: 410px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #646970;
+}
+
+.at-ai-assistant-api-key-toggle:hover {
+    color: #0073aa;
+}
+
+/* Dashboard Stats */
+.at-ai-assistant-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.at-ai-assistant-stat-card {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+    padding: 20px;
+    text-align: center;
+}
+
+.at-ai-assistant-stat-number {
+    font-size: 32px;
+    font-weight: 600;
+    color: #0073aa;
+    margin-bottom: 5px;
+}
+
+.at-ai-assistant-stat-label {
+    color: #646970;
+    font-size: 14px;
+}
+
+/* RTL Support */
+body.rtl .at-ai-assistant-form-table th {
+    text-align: right;
+    padding: 15px 0 15px 10px;
+}
+
+body.rtl .at-ai-assistant-api-key-toggle {
+    left: auto;
+    right: 410px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .at-ai-assistant-tabs .nav-tab {
+        margin: 0 10px 0 0;
+    }
+    
+    .at-ai-assistant-form-table th,
+    .at-ai-assistant-form-table td {
+        display: block;
+        width: 100%;
+    }
+    
+    .at-ai-assistant-form-table th {
+        padding-bottom: 5px;
+    }
+    
+    .at-ai-assistant-api-key-toggle {
+        position: static;
+        transform: none;
+        margin-top: 10px;
+    }
+}
