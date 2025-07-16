@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: WordPress AI Assistant
- * Plugin URI: https://github.com/your-username/wordpress-ai-assistant
+ * Plugin URI: https://github.com/athbss/wp-ai-bro
  * Description: תוסף WordPress מתקדם המספק יכולות בינה מלאכותית לשיפור תהליכי יצירת תוכן, נגישות וחוויית המשתמש
  * Version: 1.0.1
  * Author: Amit Trabelsi
@@ -14,7 +14,7 @@
  * Tested up to: 6.4
  * Requires PHP: 7.4
  * Network: false
- * Update URI: https://github.com/your-username/wordpress-ai-assistant
+ * Update URI: https://raw.githubusercontent.com/athbss/wp-ai-bro/main/plugin-info.json
  */
 
 // If this file is called directly, abort.

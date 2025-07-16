@@ -1,0 +1,23 @@
+{
+  "name": "WordPress AI Assistant",
+  "version": "1.0.1",
+  "download_url": "https://github.com/athbss/wp-ai-bro/releases/download/v1.0.1/wordpress-ai-assistant-1.0.1.zip",
+  "requires": "5.0",
+  "tested": "6.6",
+  "requires_php": "7.4",
+  "last_updated": "2025-01-16 12:00:00",
+  "sections": {
+    "description": "תוסף WordPress מתקדם המספק יכולות בינה מלאכותית לשיפור תהליכי יצירת תוכן, נגישות וחוויית המשתמש",
+    "changelog": "<h4>1.0.1</h4><ul><li>עדכון ראשוני עם יכולות AI בסיסיות</li><li>תמיכה בעברית</li><li>אינטגרציה עם WordPress</li></ul>"
+  },
+  "plugin": {
+    "version": "1.0.1",
+    "name": "WordPress AI Assistant",
+    "slug": "wordpress-ai-assistant",
+    "author": "Amit Trabelsi",
+    "author_profile": "https://amit-trabelsi.co.il",
+    "requires": "5.0",
+    "tested": "6.6",
+    "channel": "stable"
+  }
+}
