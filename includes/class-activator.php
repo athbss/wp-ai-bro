@@ -84,16 +84,58 @@ class AT_WordPress_AI_Assistant_Activator {
             id bigint(20) NOT NULL AUTO_INCREMENT,
             attachment_id bigint(20) NOT NULL,
             ai_description text,
+            ai_alt_text text,
             confidence_score decimal(3,2),
             processed_at datetime DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             UNIQUE KEY attachment_id (attachment_id)
+        ) $charset_collate;";
+
+        // Usage tracking table
+        $table_usage = $wpdb->prefix . 'ai_assistant_usage';
+        $sql_usage = "CREATE TABLE $table_usage (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            provider varchar(50) NOT NULL,
+            action varchar(100) NOT NULL,
+            model varchar(100) NOT NULL,
+            input_tokens int(11) DEFAULT 0,
+            output_tokens int(11) DEFAULT 0,
+            total_tokens int(11) DEFAULT 0,
+            cost decimal(10,6) DEFAULT 0.000000,
+            user_id bigint(20) DEFAULT NULL,
+            post_id bigint(20) DEFAULT NULL,
+            metadata longtext,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            KEY provider (provider),
+            KEY action (action),
+            KEY user_id (user_id),
+            KEY created_at (created_at)
+        ) $charset_collate;";
+        
+        // Chat logs table
+        $table_chat_logs = $wpdb->prefix . 'ai_assistant_chat_logs';
+        $sql_chat_logs = "CREATE TABLE $table_chat_logs (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            user_id bigint(20) DEFAULT NULL,
+            session_id varchar(100) NOT NULL,
+            user_message text NOT NULL,
+            ai_response text NOT NULL,
+            context varchar(50) DEFAULT 'general',
+            tokens_used int(11) DEFAULT 0,
+            timestamp datetime DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            KEY user_id (user_id),
+            KEY session_id (session_id),
+            KEY timestamp (timestamp)
         ) $charset_collate;";
         
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql_settings);
         dbDelta($sql_logs);
         dbDelta($sql_media_meta);
+        dbDelta($sql_usage);
+        dbDelta($sql_chat_logs);
     }
     
     /**
@@ -103,14 +145,35 @@ class AT_WordPress_AI_Assistant_Activator {
      */
     private static function set_default_options() {
         $default_options = array(
-            'ai_provider' => 'openai',
+            'active_provider' => 'openai',
             'enabled_post_types' => array('post', 'page'),
-            'auto_excerpt' => true,
-            'auto_tagging' => false,
-            'tts_enabled' => true,
-            'image_analysis_enabled' => true
+            'auto_generate_alt_text' => true,
+            'auto_tagging_enabled' => false,
+            'auto_generate_excerpt' => false,
+            'auto_categorize_enabled' => false,
+            'auto_tag_media_enabled' => true,
+            'ai_credentials' => array(),
+            'openai_model' => 'gpt-4o-mini',
+            'anthropic_model' => 'claude-3-haiku-20240307',
+            'google_model' => 'gemini-pro',
+            // Chat settings
+            'chat_enabled' => false,
+            'chat_enabled_in_admin' => true,
+            'chat_enabled_for_all' => false,
+            'chat_enabled_for_visitors' => false,
+            'chat_show_in_admin_bar' => true,
+            'chat_load_on_pages' => 'all',
+            'chat_specific_pages' => array(),
+            'chat_max_tokens' => 1000,
+            'chat_temperature' => 0.7,
+            'chat_welcome_message' => __('שלום! אני העוזר הדיגיטלי של האתר. איך אוכל לעזור לך היום?', 'wordpress-ai-assistant'),
+            'chat_auto_open' => false,
+            'chat_sound_enabled' => true,
+            'chat_show_timestamp' => true,
+            'chat_enable_markdown' => true,
+            'chat_auto_show_floating' => true, // Show floating chat by default
         );
-        
+
         foreach ($default_options as $key => $value) {
             if (get_option('at_ai_assistant_' . $key) === false) {
                 add_option('at_ai_assistant_' . $key, $value);

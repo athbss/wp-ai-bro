@@ -1,0 +1,466 @@
+# Copyright (C) 2025 Amit Trabelsi
+# This file is distributed under the GPL v2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: WordPress AI Assistant 1.2.0\n"
+"Report-Msgid-Bugs-To: https://github.com/athbss/wp-ai-bro/issues\n"
+"POT-Creation-Date: 2025-12-08 12:00+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Amit Trabelsi <amit@amit-trabelsi.co.il>\n"
+"Language-Team: Hebrew\n"
+"Language: he_IL\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: WordPress AI Assistant\n"
+"X-Domain: wordpress-ai-assistant\n"
+
+#: admin/class-admin.php:94
+msgid "Testing connection..."
+msgstr ""
+
+#: admin/class-admin.php:95
+msgid "Connection successful!"
+msgstr ""
+
+#: admin/class-admin.php:96
+msgid "Connection failed!"
+msgstr ""
+
+#: admin/class-admin.php:97
+msgid "Saving..."
+msgstr ""
+
+#: admin/class-admin.php:98
+msgid "Settings saved!"
+msgstr ""
+
+#: admin/class-admin.php:99
+msgid "Processing with AI..."
+msgstr ""
+
+#: admin/class-admin.php:100
+msgid "AI processing completed!"
+msgstr ""
+
+#: admin/class-admin.php:112
+msgid "AI Assistant"
+msgstr ""
+
+#: admin/class-admin.php:124
+msgid "Settings"
+msgstr ""
+
+#: admin/class-admin.php:133
+msgid "Usage & Costs"
+msgstr ""
+
+#: admin/class-admin.php:142
+msgid "AI Playground"
+msgstr ""
+
+#: admin/class-admin.php:209
+msgid "Enable AI processing for this post"
+msgstr ""
+
+#: admin/class-admin.php:215
+msgid "Process with AI"
+msgstr ""
+
+#: admin/class-admin.php:218
+msgid "This will generate tags, optimize content, and perform other AI enhancements."
+msgstr ""
+
+#: admin/class-admin.php:317
+msgid "Insufficient permissions"
+msgstr ""
+
+#: admin/class-admin.php:322
+msgid "Security check failed"
+msgstr ""
+
+#: admin/class-admin.php:328
+msgid "Invalid post ID"
+msgstr ""
+
+#: admin/class-admin.php:333
+msgid "Post not found"
+msgstr ""
+
+#: admin/class-admin.php:344
+msgid "AI processing is not enabled for this post type"
+msgstr ""
+
+#: admin/class-admin.php:355
+msgid "Post processed successfully with AI"
+msgstr ""
+
+#: admin/class-admin.php:436
+msgid "Generate a concise excerpt (2-3 sentences) for the following content: %s"
+msgstr ""
+
+#: admin/class-admin.php:487
+msgid "General Settings"
+msgstr ""
+
+#: admin/class-admin.php:494
+msgid "AI Providers"
+msgstr ""
+
+#: admin/class-admin.php:501
+msgid "AI Features"
+msgstr ""
+
+#: admin/class-admin.php:509
+msgid "Active Provider"
+msgstr ""
+
+#: admin/class-admin.php:517
+msgid "Post Types with AI Assistant"
+msgstr ""
+
+#: admin/class-admin.php:525
+msgid "AI Features"
+msgstr ""
+
+#: admin/class-admin.php:539
+msgid "Settings Saved"
+msgstr ""
+
+#: admin/class-admin.php:545
+msgid "WordPress AI Assistant Settings"
+msgstr ""
+
+#: admin/class-admin.php:574
+msgid "General"
+msgstr ""
+
+#: admin/class-admin.php:575
+msgid "API Credentials"
+msgstr ""
+
+#: admin/class-admin.php:593
+msgid "Configure general settings for the AI Assistant plugin."
+msgstr ""
+
+#: admin/class-admin.php:600
+msgid "Configure AI providers and their settings."
+msgstr ""
+
+#: admin/class-admin.php:607
+msgid "Enable or disable specific AI features."
+msgstr ""
+
+#: admin/class-admin.php:625
+msgid "Select the AI provider to use for all AI operations."
+msgstr ""
+
+#: admin/class-admin.php:649
+msgid "Select which post types should have the AI assistant attached (meta box and automatic processing)."
+msgstr ""
+
+#: admin/class-admin.php:659
+msgid "Auto-generate alt text for images"
+msgstr ""
+
+#: admin/class-admin.php:660
+msgid "Auto-tagging and categorization"
+msgstr ""
+
+#: admin/class-admin.php:661
+msgid "Auto-generate excerpt"
+msgstr ""
+
+#: admin/class-admin.php:662
+msgid "Auto-create categories"
+msgstr ""
+
+#: admin/class-admin.php:663
+msgid "Auto-tag uploaded media"
+msgstr ""
+
+#: admin/class-admin.php:678
+msgid "Enable or disable specific AI features globally."
+msgstr ""
+
+#: admin/class-admin.php:694
+msgid "These instructions will be automatically added to all AI prompts. Use this to define general writing style, tone, or content guidelines."
+msgstr ""
+
+#: admin/class-admin.php:706
+msgid "These instructions will be added to image generation prompts. Use this to define visual style, color schemes, design preferences, etc."
+msgstr ""
+
+#: admin/class-admin.php:712
+msgid "Enter your %s API key."
+msgstr ""
+
+#: admin/class-admin.php:752
+msgid "AI Usage & Costs"
+msgstr ""
+
+#: admin/class-admin.php:756
+msgid "Total Requests"
+msgstr ""
+
+#: admin/class-admin.php:764
+msgid "Total Tokens"
+msgstr ""
+
+#: admin/class-admin.php:772
+msgid "Total Cost"
+msgstr ""
+
+#: admin/class-admin.php:778
+msgid "Usage by Provider"
+msgstr ""
+
+#: admin/class-admin.php:782
+msgid "Provider"
+msgstr ""
+
+#: admin/class-admin.php:783
+msgid "Requests"
+msgstr ""
+
+#: admin/class-admin.php:784
+msgid "Tokens"
+msgstr ""
+
+#: admin/class-admin.php:785
+msgid "Cost"
+msgstr ""
+
+#: admin/class-admin.php:786
+msgid "Avg Cost/Request"
+msgstr ""
+
+#: admin/class-admin.php:812
+msgid "AI Playground"
+msgstr ""
+
+#: admin/class-admin.php:816
+msgid "Test AI Generation"
+msgstr ""
+
+#: admin/class-admin.php:821
+msgid "Prompt"
+msgstr ""
+
+#: admin/class-admin.php:825
+msgid "Enter your prompt here..."
+msgstr ""
+
+#: admin/class-admin.php:830
+msgid "Max Tokens"
+msgstr ""
+
+#: admin/class-admin.php:839
+msgid "Generate"
+msgstr ""
+
+#: admin/class-admin.php:846
+msgid "Result"
+msgstr ""
+
+#: admin/class-admin.php:848
+msgid "Results will appear here..."
+msgstr ""
+
+#: admin/class-admin.php:900
+msgid "Provider not specified"
+msgstr ""
+
+#: admin/class-admin.php:920
+msgid "Connection successful!"
+msgstr ""
+
+#: admin/class-admin.php:941
+msgid "Prompt cannot be empty"
+msgstr ""
+
+#: includes/ai/class-ai-manager.php:131
+msgid "AI provider not found"
+msgstr ""
+
+#: includes/ai/class-ai-manager.php:206
+msgid "Translate the following text to %s (%s)"
+msgstr ""
+
+#: includes/ai/class-ai-manager.php:209
+msgid " from %s (%s)"
+msgstr ""
+
+#: includes/ai/class-ai-manager.php:213
+msgid "Context:"
+msgstr ""
+
+#: includes/ai/class-ai-manager.php:219
+msgid "The post is in %s, ensure the translation maintains the same tone and style."
+msgstr ""
+
+#: includes/ai/class-ai-manager.php:223
+msgid "Translation:"
+msgstr ""
+
+#: includes/ai/class-ai-manager.php:247
+msgid "IMPORTANT: The content is in %s (%s). Generate tags and categories in the same language."
+msgstr ""
+
+#: includes/ai/class-ai-manager.php:250
+msgid "Analyze the following content and suggest relevant tags and categories."
+msgstr ""
+
+#: includes/ai/class-ai-manager.php:251
+msgid "Content:"
+msgstr ""
+
+#: includes/ai/class-ai-manager.php:254
+msgid "Available taxonomies:"
+msgstr ""
+
+#: includes/ai/class-ai-manager.php:260
+msgid "Suggest tags and categories in the following format:"
+msgstr ""
+
+#: includes/ai/class-ai-manager.php:261
+msgid "Tags:"
+msgstr ""
+
+#: includes/ai/class-ai-manager.php:262
+msgid "Categories:"
+msgstr ""
+
+#: includes/ai/class-ai-manager.php:263
+msgid "Target Audience:"
+msgstr ""
+
+#: includes/ai/class-openai-provider.php:88
+msgid "OpenAI API key is required"
+msgstr ""
+
+#: includes/ai/class-openai-provider.php:122
+msgid "Invalid response from OpenAI API"
+msgstr ""
+
+#: includes/ai/class-anthropic-provider.php:101
+msgid "Anthropic API key is required"
+msgstr ""
+
+#: includes/ai/class-anthropic-provider.php:142
+msgid "Invalid response from Anthropic API"
+msgstr ""
+
+#: includes/ai/class-google-provider.php:80
+msgid "Google AI API key is required"
+msgstr ""
+
+#: includes/ai/class-google-provider.php:116
+msgid "Invalid response from Google AI API"
+msgstr ""
+
+#: includes/features/class-image-alt-generator.php:123
+msgid "Invalid attachment"
+msgstr ""
+
+#: includes/features/class-image-alt-generator.php:135
+msgid "Alt text generated successfully"
+msgstr ""
+
+#: includes/features/class-image-alt-generator.php:149
+msgid "Analyze this image and provide a concise, descriptive alt text that would be appropriate for accessibility purposes. Focus on the main subject, key elements, and context. Keep it under 125 characters. Do not include phrases like 'image of' or 'picture of' - just describe what's in the image directly."
+msgstr ""
+
+#: includes/features/class-image-alt-generator.php:156
+msgid "IMPORTANT: Generate the alt text in %s (%s)."
+msgstr ""
+
+#: includes/features/class-image-alt-generator.php:219
+msgid "Alt text generated successfully"
+msgstr ""
+
+#: includes/features/class-auto-tagger.php:167
+msgid "Tags generated and applied successfully"
+msgstr ""
+
+#: includes/features/class-auto-tagger.php:304
+msgid "Insufficient permissions"
+msgstr ""
+
+#: includes/features/class-auto-tagger.php:326
+msgid "No content found to analyze"
+msgstr ""
+
+#: includes/features/class-auto-tagger.php:338
+msgid "Tags generated successfully"
+msgstr ""
+
+#: includes/features/class-text-translator.php:77
+msgid "Text cannot be empty"
+msgstr ""
+
+#: includes/features/class-text-translator.php:92
+msgid "Text translated successfully"
+msgstr ""
+
+#: includes/features/class-text-translator.php:114
+msgid "Detect the language of the following text and respond with only the language code (e.g., \"en\", \"he\", \"es\"). If you cannot determine the language, respond with \"unknown\". Text: %s"
+msgstr ""
+
+#: includes/features/class-text-translator.php:173
+msgid "Target language is required"
+msgstr ""
+
+#: includes/features/class-text-translator.php:188
+msgid "Text translated successfully"
+msgstr ""
+
+#: includes/features/class-text-translator.php:221
+msgid "Language detected successfully"
+msgstr ""
+
+#: includes/features/class-text-translator.php:250
+msgid "Translating..."
+msgstr ""
+
+#: includes/features/class-text-translator.php:251
+msgid "Detecting language..."
+msgstr ""
+
+#: includes/features/class-text-translator.php:252
+msgid "Error occurred"
+msgstr ""
+
+#: includes/features/class-text-translator.php:253
+msgid "Please enter text to translate"
+msgstr ""
+
+#: includes/features/class-text-translator.php:254
+msgid "Please select target language"
+msgstr ""
+
+#: includes/features/class-text-translator.php:270
+msgid "AI Translation"
+msgstr ""
+
+#: includes/features/class-text-translator.php:294
+msgid "Enable AI translation for this post"
+msgstr ""
+
+#: includes/features/class-text-translator.php:301
+msgid "Existing Translations:"
+msgstr ""
+
+#: includes/features/class-text-translator.php:312
+msgid "Quick translate to..."
+msgstr ""
+
+#: includes/features/class-text-translator.php:318
+msgid "Translate"
+msgstr ""
+
+#: includes/functions.php:95
+msgid "IMPORTANT: Respond in %s (%s). All generated content must be in this language."
+msgstr ""
+

@@ -1,0 +1,164 @@
+name: Build & Deploy Plugin
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - trunk
+  pull_request:
+    branches:
+      - main
+      - master
+      - trunk
+  workflow_dispatch:
+    inputs:
+      retention-days:
+        description: 'Number of days to keep the zip archive'
+        required: false
+        default: '5'
+        type: number
+
+env:
+  PLUGIN_SLUG: wordpress-ai-assistant
+
+jobs:
+  build:
+    name: Build Plugin ZIP
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          tools: composer
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Get plugin version
+        id: get_version
+        run: |
+          VERSION=$(grep -m 1 "Version:" ${{ env.PLUGIN_SLUG }}.php | awk -F': ' '{print $2}' | tr -d '\r')
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "Plugin version: ${VERSION}"
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v3
+        with:
+          path: vendor
+          key: php-${{ hashFiles('composer.lock') }}
+          restore-keys: php-
+
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: node-${{ hashFiles('package-lock.json') }}
+          restore-keys: node-
+
+      - name: Install PHP dependencies
+        if: ${{ hashFiles('composer.json') != '' }}
+        run: composer install --no-dev --optimize-autoloader
+
+      - name: Install Node.js dependencies
+        if: ${{ hashFiles('package.json') != '' }}
+        run: npm ci
+
+      - name: Build assets
+        if: ${{ hashFiles('package.json') != '' }}
+        run: npm run build
+
+      - name: Generate ZIP archive
+        uses: 10up/action-wordpress-plugin-build-zip@stable
+        env:
+          SLUG: ${{ env.PLUGIN_SLUG }}
+        with:
+          retention-days: ${{ github.event.inputs.retention-days || 5 }}
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.PLUGIN_SLUG }}-${{ github.sha }}
+          path: ${{ github.workspace }}/${{ env.PLUGIN_SLUG }}.zip
+          retention-days: ${{ github.event.inputs.retention-days || 5 }}
+
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          tools: composer, phpunit
+
+      - name: Install PHP dependencies
+        run: composer install
+
+      - name: Run PHP tests
+        run: |
+          if [ -f phpunit.xml ]; then
+            phpunit
+          else
+            echo "No phpunit.xml found, skipping tests"
+          fi
+
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [build, test]
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.PLUGIN_SLUG }}-${{ github.sha }}
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ${{ env.PLUGIN_SLUG }}.zip
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update plugin info JSON
+        run: |
+          VERSION=${{ needs.build.outputs.version }}
+          REPO_NAME=$(basename ${{ github.repository }})
+
+          # Update plugin-info.json with new version
+          jq --arg version "$VERSION" \
+             --arg download_url "https://github.com/${{ github.repository }}/releases/download/v$VERSION/${{ env.PLUGIN_SLUG }}-$VERSION.zip" \
+             --arg last_updated "$(date +'%Y-%m-%d %H:%M:%S')" \
+             '.version = $version | .download_url = $download_url | .last_updated = $last_updated | .sections.changelog = "גרסה \($version)"' \
+             plugin-info.json > plugin-info.json.tmp && mv plugin-info.json.tmp plugin-info.json
+
+      - name: Commit updated plugin info
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: 'plugin-info.json'
+          message: 'Update plugin info for version ${{ needs.build.outputs.version }}'
+          pull: '--rebase --autostash'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

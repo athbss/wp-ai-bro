@@ -110,6 +110,64 @@ class AT_WordPress_AI_Assistant_Core {
         require_once WORDPRESS_AI_ASSISTANT_PATH . 'includes/class-i18n.php';
 
         /**
+         * Helper functions - Load early as they're used by other classes
+         */
+        require_once WORDPRESS_AI_ASSISTANT_PATH . 'includes/functions.php';
+
+        /**
+         * Dependency Checker - Check for required and recommended dependencies
+         */
+        require_once WORDPRESS_AI_ASSISTANT_PATH . 'includes/class-dependency-checker.php';
+
+        /**
+         * AI Services Infrastructure
+         */
+        require_once WORDPRESS_AI_ASSISTANT_PATH . 'includes/ai/class-ai-provider.php';
+        require_once WORDPRESS_AI_ASSISTANT_PATH . 'includes/ai/class-ai-manager.php';
+        require_once WORDPRESS_AI_ASSISTANT_PATH . 'includes/ai/class-ai-usage-tracker.php';
+        require_once WORDPRESS_AI_ASSISTANT_PATH . 'includes/ai/class-openai-provider.php';
+        require_once WORDPRESS_AI_ASSISTANT_PATH . 'includes/ai/class-anthropic-provider.php';
+        require_once WORDPRESS_AI_ASSISTANT_PATH . 'includes/ai/class-google-provider.php';
+
+        /**
+         * AI Features
+         */
+        require_once WORDPRESS_AI_ASSISTANT_PATH . 'includes/features/class-image-alt-generator.php';
+        require_once WORDPRESS_AI_ASSISTANT_PATH . 'includes/features/class-text-translator.php';
+        require_once WORDPRESS_AI_ASSISTANT_PATH . 'includes/features/class-auto-tagger.php';
+        require_once WORDPRESS_AI_ASSISTANT_PATH . 'includes/features/class-media-ai-generator.php';
+        require_once WORDPRESS_AI_ASSISTANT_PATH . 'includes/features/class-content-optimizer.php';
+
+        /**
+         * Initialize AI Features
+         */
+        $this->image_alt_generator = new AT_Image_Alt_Generator();
+        $this->text_translator = new AT_Text_Translator();
+        $this->auto_tagger = new AT_Auto_Tagger();
+        $this->media_ai_generator = new AT_Media_AI_Generator();
+        $this->content_optimizer = new AT_Content_Optimizer();
+        
+        // Initialize Chat feature - will check if enabled internally
+        require_once WORDPRESS_AI_ASSISTANT_PATH . 'includes/features/class-ai-chat.php';
+        
+        // Load simple chat immediately for testing
+        require_once WORDPRESS_AI_ASSISTANT_PATH . 'includes/features/class-ai-chat-simple.php';
+        
+        // Initialize full chat on init hook to ensure settings are loaded
+        add_action('init', function() {
+            if (at_ai_assistant_get_option('chat_enabled', false)) {
+                new AT_AI_Chat();
+                // Also initialize simple chat for immediate display
+                new AT_AI_Chat_Simple();
+            }
+        });
+
+        /**
+         * Initialize Dependency Checker
+         */
+        $this->dependency_checker = AT_Dependency_Checker::get_instance();
+
+        /**
          * The class responsible for defining all actions that occur in the admin area.
          */
         require_once WORDPRESS_AI_ASSISTANT_PATH . 'admin/class-admin.php';
@@ -119,11 +177,6 @@ class AT_WordPress_AI_Assistant_Core {
          * side of the site.
          */
         require_once WORDPRESS_AI_ASSISTANT_PATH . 'public/class-public.php';
-
-        /**
-         * Helper functions
-         */
-        require_once WORDPRESS_AI_ASSISTANT_PATH . 'includes/functions.php';
 
         $this->loader = new AT_WordPress_AI_Assistant_Loader();
     }

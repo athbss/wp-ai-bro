@@ -1,0 +1,488 @@
+# Hebrew translation for WordPress AI Assistant
+# Copyright (C) 2025 Amit Trabelsi
+# This file is distributed under the GPL v2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: WordPress AI Assistant 1.2.0\n"
+"Report-Msgid-Bugs-To: https://github.com/athbss/wp-ai-bro/issues\n"
+"POT-Creation-Date: 2025-12-08 12:00+0000\n"
+"PO-Revision-Date: 2025-12-08 12:00+0200\n"
+"Last-Translator: Amit Trabelsi <amit@amit-trabelsi.co.il>\n"
+"Language-Team: Hebrew\n"
+"Language: he_IL\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit\n"
+
+msgid "Testing connection..."
+msgstr "בודק חיבור..."
+
+msgid "Connection successful!"
+msgstr "חיבור הצליח!"
+
+msgid "Connection failed!"
+msgstr "חיבור נכשל!"
+
+msgid "Saving..."
+msgstr "שומר..."
+
+msgid "Settings saved!"
+msgstr "הגדרות נשמרו!"
+
+msgid "Processing with AI..."
+msgstr "מעבד עם AI..."
+
+msgid "AI processing completed!"
+msgstr "עיבוד AI הושלם!"
+
+msgid "AI Assistant"
+msgstr "עוזר AI"
+
+msgid "Settings"
+msgstr "הגדרות"
+
+msgid "Usage & Costs"
+msgstr "שימוש ועלויות"
+
+msgid "AI Playground"
+msgstr "מגרש משחקים AI"
+
+msgid "Enable AI processing for this post"
+msgstr "הפעל עיבוד AI לפוסט זה"
+
+msgid "Process with AI"
+msgstr "עבד עם AI"
+
+msgid "This will generate tags, optimize content, and perform other AI enhancements."
+msgstr "פעולה זו תייצר תגיות, תבצע אופטימיזציה לתוכן, ותבצע שיפורי AI נוספים."
+
+msgid "Insufficient permissions"
+msgstr "אין הרשאות מספיקות"
+
+msgid "Security check failed"
+msgstr "בדיקת אבטחה נכשלה"
+
+msgid "Invalid post ID"
+msgstr "מזהה פוסט לא תקין"
+
+msgid "Post not found"
+msgstr "פוסט לא נמצא"
+
+msgid "AI processing is not enabled for this post type"
+msgstr "עיבוד AI לא מופעל עבור סוג פוסט זה"
+
+msgid "Post processed successfully with AI"
+msgstr "פוסט עובד בהצלחה עם AI"
+
+msgid "Generate a concise excerpt (2-3 sentences) for the following content: %s"
+msgstr "צור תקציר תמציתי (2-3 משפטים) לתוכן הבא: %s"
+
+msgid "General Settings"
+msgstr "הגדרות כלליות"
+
+msgid "AI Providers"
+msgstr "ספקי AI"
+
+msgid "AI Features"
+msgstr "תכונות AI"
+
+msgid "Active Provider"
+msgstr "ספק פעיל"
+
+msgid "Post Types with AI Assistant"
+msgstr "סוגי פוסטים עם עוזר AI"
+
+msgid "Settings Saved"
+msgstr "הגדרות נשמרו"
+
+msgid "WordPress AI Assistant Settings"
+msgstr "הגדרות עוזר AI לוורדפרס"
+
+msgid "General"
+msgstr "כללי"
+
+msgid "API Credentials"
+msgstr "מפתחות API"
+
+msgid "Configure general settings for the AI Assistant plugin."
+msgstr "הגדר הגדרות כלליות לתוסף עוזר ה-AI."
+
+msgid "Configure AI providers and their settings."
+msgstr "הגדר ספקי AI והגדרותיהם."
+
+msgid "Enable or disable specific AI features."
+msgstr "הפעל או השבת תכונות AI ספציפיות."
+
+msgid "Select the AI provider to use for all AI operations."
+msgstr "בחר את ספק ה-AI לשימוש בכל פעולות ה-AI."
+
+msgid "Select which post types should have the AI assistant attached (meta box and automatic processing)."
+msgstr "בחר אילו סוגי פוסטים יכללו את עוזר ה-AI (תיבת מטא ועיבוד אוטומטי)."
+
+msgid "Auto-generate alt text for images"
+msgstr "צור טקסט חלופי אוטומטי לתמונות"
+
+msgid "Auto-tagging and categorization"
+msgstr "תיוג וקיטלוג אוטומטי"
+
+msgid "Auto-generate excerpt"
+msgstr "צור תקציר אוטומטי"
+
+msgid "Auto-create categories"
+msgstr "צור קטגוריות אוטומטית"
+
+msgid "Auto-tag uploaded media"
+msgstr "תייג מדיה מועלית אוטומטית"
+
+msgid "Enable or disable specific AI features globally."
+msgstr "הפעל או השבת תכונות AI ספציפיות בצורה גלובלית."
+
+msgid "General Prompt Instructions"
+msgstr "הנחיות כלליות לפרומפטים"
+
+msgid "Example: Write in a professional tone, use clear and concise language, avoid jargon..."
+msgstr "דוגמה: כתוב בטון מקצועי, השתמש בשפה ברורה ותמציתית, הימנע מז'רגון..."
+
+msgid "These instructions will be automatically added to all AI prompts. Use this to define general writing style, tone, or content guidelines."
+msgstr "הנחיות אלו יתווספו אוטומטית לכל הפרומפטים של AI. השתמש בזה כדי להגדיר סגנון כתיבה כללי, טון, או הנחיות תוכן."
+
+msgid "Visual Style Instructions"
+msgstr "הנחיות סגנון ויזואלי"
+
+msgid "Example: Use modern, clean design style. Prefer vibrant colors. Maintain professional appearance..."
+msgstr "דוגמה: השתמש בסגנון עיצובי מודרני ונקי. העדף צבעים תוססים. שמור על מראה מקצועי..."
+
+msgid "These instructions will be added to image generation prompts. Use this to define visual style, color schemes, design preferences, etc."
+msgstr "הנחיות אלו יתווספו לפרומפטים של יצירת תמונות. השתמש בזה כדי להגדיר סגנון ויזואלי, ערכות צבעים, העדפות עיצוב, וכו'."
+
+msgid "Enter your %s API key."
+msgstr "הזן את מפתח ה-API של %s."
+
+msgid "Test Connection"
+msgstr "בדוק חיבור"
+
+msgid "Total Requests"
+msgstr "סך בקשות"
+
+msgid "Total Tokens"
+msgstr "סך טוקנים"
+
+msgid "Total Cost"
+msgstr "עלות כוללת"
+
+msgid "Usage by Provider"
+msgstr "שימוש לפי ספק"
+
+msgid "Provider"
+msgstr "ספק"
+
+msgid "Requests"
+msgstr "בקשות"
+
+msgid "Tokens"
+msgstr "טוקנים"
+
+msgid "Cost"
+msgstr "עלות"
+
+msgid "Avg Cost/Request"
+msgstr "עלות ממוצעת לבקשה"
+
+msgid "Test AI Generation"
+msgstr "בדיקת יצירת AI"
+
+msgid "Prompt"
+msgstr "פרומפט"
+
+msgid "Enter your prompt here..."
+msgstr "הזן את הפרומפט שלך כאן..."
+
+msgid "Max Tokens"
+msgstr "מקסימום טוקנים"
+
+msgid "Generate"
+msgstr "צור"
+
+msgid "Result"
+msgstr "תוצאה"
+
+msgid "Results will appear here..."
+msgstr "תוצאות יופיעו כאן..."
+
+msgid "Provider not specified"
+msgstr "ספק לא צוין"
+
+msgid "Prompt cannot be empty"
+msgstr "פרומפט לא יכול להיות ריק"
+
+msgid "AI provider not found"
+msgstr "ספק AI לא נמצא"
+
+msgid "Translate the following text to %s (%s)"
+msgstr "תרגם את הטקסט הבא ל-%s (%s)"
+
+msgid " from %s (%s)"
+msgstr " מ-%s (%s)"
+
+msgid "Context:"
+msgstr "הקשר:"
+
+msgid "The post is in %s, ensure the translation maintains the same tone and style."
+msgstr "הפוסט הוא ב-%s, וודא שהתרגום שומר על אותו טון וסגנון."
+
+msgid "Translation:"
+msgstr "תרגום:"
+
+msgid "IMPORTANT: The content is in %s (%s). Generate tags and categories in the same language."
+msgstr "חשוב: התוכן הוא ב-%s (%s). צור תגיות וקטגוריות באותה השפה."
+
+msgid "Analyze the following content and suggest relevant tags and categories."
+msgstr "נתח את התוכן הבא והצע תגיות וקטגוריות רלוונטיות."
+
+msgid "Content:"
+msgstr "תוכן:"
+
+msgid "Available taxonomies:"
+msgstr "טקסונומיות זמינות:"
+
+msgid "Suggest tags and categories in the following format:"
+msgstr "הצע תגיות וקטגוריות בפורמט הבא:"
+
+msgid "Tags:"
+msgstr "תגיות:"
+
+msgid "Categories:"
+msgstr "קטגוריות:"
+
+msgid "Target Audience:"
+msgstr "קהל יעד:"
+
+msgid "OpenAI API key is required"
+msgstr "נדרש מפתח API של OpenAI"
+
+msgid "Invalid response from OpenAI API"
+msgstr "תשובה לא תקינה מ-API של OpenAI"
+
+msgid "Anthropic API key is required"
+msgstr "נדרש מפתח API של Anthropic"
+
+msgid "Invalid response from Anthropic API"
+msgstr "תשובה לא תקינה מ-API של Anthropic"
+
+msgid "Google AI API key is required"
+msgstr "נדרש מפתח API של Google AI"
+
+msgid "Invalid response from Google AI API"
+msgstr "תשובה לא תקינה מ-API של Google AI"
+
+msgid "Invalid attachment"
+msgstr "קובץ מצורף לא תקין"
+
+msgid "Alt text generated successfully"
+msgstr "טקסט חלופי נוצר בהצלחה"
+
+msgid "Analyze this image and provide a concise, descriptive alt text that would be appropriate for accessibility purposes. Focus on the main subject, key elements, and context. Keep it under 125 characters. Do not include phrases like 'image of' or 'picture of' - just describe what's in the image directly."
+msgstr "נתח את התמונה הזו וספק טקסט חלופי תמציתי ומתאר שמתאים למטרות נגישות. התמקד בנושא הראשי, אלמנטים מרכזיים והקשר. שמור מתחת ל-125 תווים. אל תכלול ביטויים כמו 'תמונה של' או 'תמונה המציגה' - פשוט תאר מה יש בתמונה ישירות."
+
+msgid "IMPORTANT: Generate the alt text in %s (%s)."
+msgstr "חשוב: צור את הטקסט החלופי ב-%s (%s)."
+
+msgid "Tags generated and applied successfully"
+msgstr "תגיות נוצרו והוחלו בהצלחה"
+
+msgid "No content found to analyze"
+msgstr "לא נמצא תוכן לניתוח"
+
+msgid "Tags generated successfully"
+msgstr "תגיות נוצרו בהצלחה"
+
+msgid "AI Generated Tags:"
+msgstr "תגיות שנוצרו על ידי AI:"
+
+msgid "AI Tagging"
+msgstr "תיוג AI"
+
+msgid "Generate Tags"
+msgstr "צור תגיות"
+
+msgid "Apply Tags"
+msgstr "החל תגיות"
+
+msgid "Preview:"
+msgstr "תצוגה מקדימה:"
+
+msgid "Automatically generate and apply tags to posts on save"
+msgstr "צור והחל תגיות אוטומטית לפוסטים בשמירה"
+
+msgid "When enabled, AI will analyze post content and automatically suggest relevant tags and categories."
+msgstr "כאשר מופעל, AI ינתח את תוכן הפוסט ויציע אוטומטית תגיות וקטגוריות רלוונטיות."
+
+msgid "Automatically generate tags for uploaded images"
+msgstr "צור תגיות אוטומטית לתמונות מועלות"
+
+msgid "When enabled, AI will analyze uploaded images and generate relevant tags based on image content."
+msgstr "כאשר מופעל, AI ינתח תמונות מועלות ויצור תגיות רלוונטיות על בסיס תוכן התמונה."
+
+msgid "Text cannot be empty"
+msgstr "טקסט לא יכול להיות ריק"
+
+msgid "Text translated successfully"
+msgstr "טקסט תורגם בהצלחה"
+
+msgid "Detect the language of the following text and respond with only the language code (e.g., \"en\", \"he\", \"es\"). If you cannot determine the language, respond with \"unknown\". Text: %s"
+msgstr "זהה את השפה של הטקסט הבא והשב רק עם קוד השפה (לדוגמה, \"en\", \"he\", \"es\"). אם לא ניתן לקבוע את השפה, השב עם \"unknown\". טקסט: %s"
+
+msgid "Target language is required"
+msgstr "נדרשת שפת יעד"
+
+msgid "Language detected successfully"
+msgstr "שפה זוהתה בהצלחה"
+
+msgid "Translating..."
+msgstr "מתרגם..."
+
+msgid "Detecting language..."
+msgstr "מזהה שפה..."
+
+msgid "Error occurred"
+msgstr "אירעה שגיאה"
+
+msgid "Please enter text to translate"
+msgstr "אנא הזן טקסט לתרגום"
+
+msgid "Please select target language"
+msgstr "אנא בחר שפת יעד"
+
+msgid "AI Translation"
+msgstr "תרגום AI"
+
+msgid "Enable AI translation for this post"
+msgstr "הפעל תרגום AI לפוסט זה"
+
+msgid "Existing Translations:"
+msgstr "תרגומים קיימים:"
+
+msgid "Quick translate to..."
+msgstr "תרגום מהיר ל..."
+
+msgid "Translate"
+msgstr "תרגם"
+
+msgid "IMPORTANT: Respond in %s (%s). All generated content must be in this language."
+msgstr "חשוב: השב ב-%s (%s). כל התוכן שנוצר חייב להיות בשפה זו."
+
+msgid "API key is required"
+msgstr "נדרש מפתח API"
+
+msgid "API request failed with code %d: %s"
+msgstr "בקשת API נכשלה עם קוד %d: %s"
+
+msgid "Failed to decode API response"
+msgstr "נכשל בפענוח תגובת API"
+
+msgid "Image generation not supported by this provider"
+msgstr "יצירת תמונות לא נתמכת על ידי ספק זה"
+
+msgid "Unknown User"
+msgstr "משתמש לא ידוע"
+
+msgid "Unknown Post"
+msgstr "פוסט לא ידוע"
+
+msgid "Auto Tagging"
+msgstr "תיוג אוטומטי"
+
+msgid "Auto Tag Media"
+msgstr "תיוג מדיה אוטומטי"
+
+msgid "Please generate tags first"
+msgstr "אנא צור תגיות תחילה"
+
+msgid "Tags applied successfully"
+msgstr "תגיות הוחלו בהצלחה"
+
+msgid "Invalid tags data"
+msgstr "נתוני תגיות לא תקינים"
+
+msgid "Object not found"
+msgstr "אובייקט לא נמצא"
+
+msgid "Invalid object ID"
+msgstr "מזהה אובייקט לא תקין"
+
+msgid "Generating tags..."
+msgstr "יוצר תגיות..."
+
+msgid "Applying tags..."
+msgstr "מחיל תגיות..."
+
+msgid "Please select a target language"
+msgstr "אנא בחר שפת יעד"
+
+msgid "Please enter some content to translate"
+msgstr "אנא הזן תוכן לתרגום"
+
+msgid "Translation completed! Check the translations list."
+msgstr "תרגום הושלם! בדוק את רשימת התרגומים."
+
+msgid "Translation failed"
+msgstr "תרגום נכשל"
+
+msgid "Network error occurred"
+msgstr "אירעה שגיאת רשת"
+
+msgid "Processing failed"
+msgstr "עיבוד נכשל"
+
+msgid "Try Again"
+msgstr "נסה שוב"
+
+msgid "Generating..."
+msgstr "יוצר..."
+
+msgid "Generated!"
+msgstr "נוצר!"
+
+msgid "Generation failed"
+msgstr "יצירה נכשלה"
+
+msgid "Failed to download image"
+msgstr "נכשל בהורדת תמונה"
+
+msgid "Empty image data"
+msgstr "נתוני תמונה ריקים"
+
+msgid "Default Model"
+msgstr "מודל ברירת מחדל"
+
+msgid "Save failed"
+msgstr "שמירה נכשלה"
+
+msgid "Hide"
+msgstr "הסתר"
+
+msgid "Show"
+msgstr "הצג"
+
+msgid "Cost ($)"
+msgstr "עלות ($)"
+
+msgid "AI Usage Cost Over Time"
+msgstr "עלות שימוש ב-AI לאורך זמן"
+
+msgid "Please enter a prompt"
+msgstr "אנא הזן פרומפט"
+
+msgid "Image generation not supported by current provider"
+msgstr "יצירת תמונות לא נתמכת על ידי הספק הנוכחי"
+
+msgid "API רשמי של WordPress לגילוי והצהרה על יכולות תוספים ונושאים בצורה machine-readable. חלק מיוזמת \"AI Building Blocks for WordPress\". ייתכן שמוטמע ב-WordPress 6.9+"
+msgstr "API רשמי של WordPress לגילוי והצהרה על יכולות תוספים ונושאים בצורה machine-readable. חלק מיוזמת \"AI Building Blocks for WordPress\". ייתכן שמוטמע ב-WordPress 6.9+"
+
+msgid "System Status"
+msgstr "מצב מערכת"
+
+msgid "מצב מערכת - WordPress AI Assistant"
+msgstr "מצב מערכת - WordPress AI Assistant"

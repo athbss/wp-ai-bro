@@ -31,6 +31,24 @@ class AT_WordPress_AI_Assistant_i18n {
      * @since    1.0.0
      */
     public function load_plugin_textdomain() {
+        // Force load Hebrew if site locale is Hebrew
+        $locale = get_locale();
+        $mofile = sprintf(
+            '%s-%s.mo',
+            WORDPRESS_AI_ASSISTANT_TEXT_DOMAIN,
+            $locale
+        );
+        $mofile_local = WORDPRESS_AI_ASSISTANT_PATH . 'languages/' . $mofile;
+        $mofile_global = WP_LANG_DIR . '/plugins/' . $mofile;
+
+        // Try to load from plugin directory first, then global
+        if (file_exists($mofile_local)) {
+            load_textdomain(WORDPRESS_AI_ASSISTANT_TEXT_DOMAIN, $mofile_local);
+        } elseif (file_exists($mofile_global)) {
+            load_textdomain(WORDPRESS_AI_ASSISTANT_TEXT_DOMAIN, $mofile_global);
+        }
+
+        // Fallback to standard load_plugin_textdomain
         load_plugin_textdomain(
             WORDPRESS_AI_ASSISTANT_TEXT_DOMAIN,
             false,
