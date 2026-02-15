@@ -152,8 +152,10 @@ class AT_WordPress_AI_Assistant_Admin {
             ));
         }
         
-        // Add footer credit
-        add_filter('admin_footer_text', array($this, 'admin_footer_text'));
+        // Add footer credit only if AT Agency Manager is not active (to avoid duplication)
+        if (!defined('AT_AGENCY_MANAGER_VERSION')) {
+            add_filter('admin_footer_text', array($this, 'admin_footer_text'));
+        }
     }
 
     /**
@@ -729,26 +731,28 @@ class AT_WordPress_AI_Assistant_Admin {
 
         settings_errors('at_ai_assistant_messages');
         ?>
-        <div class="wrap">
+        <div class="wrap at-agency-manager-wrap">
             <h1><?php _e('הגדרות עוזר AI לוורדפרס', 'wordpress-ai-assistant'); ?></h1>
 
             <?php $this->render_tabs(); ?>
 
-            <form action="options.php" method="post">
-                <?php
-                $active_tab = isset($_GET['tab']) ? $_GET['tab'] : 'general';
+            <div class="card" style="margin-top: 20px;">
+                <form action="options.php" method="post">
+                    <?php
+                    $active_tab = isset($_GET['tab']) ? $_GET['tab'] : 'general';
 
-                if ($active_tab === 'general') {
-                    settings_fields('at_ai_assistant_settings');
-                    do_settings_sections('at_ai_assistant_settings');
-                } elseif ($active_tab === 'credentials') {
-                    settings_fields('at_ai_assistant_credentials');
-                    $this->render_credentials_section();
-                }
+                    if ($active_tab === 'general') {
+                        settings_fields('at_ai_assistant_settings');
+                        do_settings_sections('at_ai_assistant_settings');
+                    } elseif ($active_tab === 'credentials') {
+                        settings_fields('at_ai_assistant_credentials');
+                        $this->render_credentials_section();
+                    }
 
-                submit_button();
-                ?>
-            </form>
+                    submit_button();
+                    ?>
+                </form>
+            </div>
         </div>
         <?php
     }
