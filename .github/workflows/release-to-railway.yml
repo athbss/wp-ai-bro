@@ -135,6 +135,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Alert on build failure
+        if: failure()
+        run: |
+          VERSION=${{ steps.get_version.outputs.version }}
+          curl -X GET "https://n8n.amiteam.io/webhook/1d99f471-381d-428b-b024-f95e742a18ed?msg=תקלה%20בבניית%20WordPress%20AI%20Assistant%20גרסה%20${VERSION}%20-%20GitHub%20Release%20נכשל&noti=true"
+
   deploy-to-railway:
     name: Update Railway CDN
     runs-on: ubuntu-latest
@@ -174,3 +180,9 @@ jobs:
         run: |
           echo "Railway will auto-deploy from the git push"
           echo "CDN URL: ${{ env.RAILWAY_CDN_URL }}/${{ env.PLUGIN_SLUG }}/plugin-info.json"
+
+      - name: Alert on deployment failure
+        if: failure()
+        run: |
+          VERSION=${{ needs.build-and-release.outputs.version }}
+          curl -X GET "https://n8n.amiteam.io/webhook/1d99f471-381d-428b-b024-f95e742a18ed?msg=תקלה%20בפריסת%20WordPress%20AI%20Assistant%20גרסה%20${VERSION}%20ל-Railway%20CDN&noti=true"
