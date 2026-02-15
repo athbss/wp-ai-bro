@@ -147,6 +147,25 @@ class AT_AI_Manager {
 
         if (!is_wp_error($result)) {
             $this->usage_tracker->track_usage($this->active_provider, 'text_generation', $result);
+            
+            // Emit suite event
+            if (function_exists('at_ai_suite_emit')) {
+                at_ai_suite_emit('ai_text_generated', array(
+                    'provider' => $this->active_provider,
+                    'model'    => isset($result['model']) ? $result['model'] : 'unknown',
+                    'tokens'   => isset($result['usage']['total_tokens']) ? $result['usage']['total_tokens'] : 0,
+                    'post_id'  => $post_id
+                ));
+            }
+        } else {
+            // Emit error event
+            if (function_exists('at_ai_suite_emit')) {
+                at_ai_suite_emit('ai_error', array(
+                    'provider'      => $this->active_provider,
+                    'method'        => 'generate_text',
+                    'error_message' => $result->get_error_message()
+                ));
+            }
         }
 
         return $result;
@@ -177,6 +196,24 @@ class AT_AI_Manager {
 
         if (!is_wp_error($result)) {
             $this->usage_tracker->track_usage($this->active_provider, 'chat', $result);
+
+            // Emit suite event
+            if (function_exists('at_ai_suite_emit')) {
+                at_ai_suite_emit('ai_chat_completed', array(
+                    'provider'       => $this->active_provider,
+                    'model'          => isset($result['model']) ? $result['model'] : 'unknown',
+                    'messages_count' => count($messages)
+                ));
+            }
+        } else {
+            // Emit error event
+            if (function_exists('at_ai_suite_emit')) {
+                at_ai_suite_emit('ai_error', array(
+                    'provider'      => $this->active_provider,
+                    'method'        => 'chat_completion',
+                    'error_message' => $result->get_error_message()
+                ));
+            }
         }
 
         return $result;
@@ -231,6 +268,23 @@ class AT_AI_Manager {
 
         if (!is_wp_error($result)) {
             $this->usage_tracker->track_usage($this->active_provider, 'image_generation', $result);
+
+            // Emit suite event
+            if (function_exists('at_ai_suite_emit')) {
+                at_ai_suite_emit('ai_image_generated', array(
+                    'provider' => $this->active_provider,
+                    'prompt'   => $prompt
+                ));
+            }
+        } else {
+            // Emit error event
+            if (function_exists('at_ai_suite_emit')) {
+                at_ai_suite_emit('ai_error', array(
+                    'provider'      => $this->active_provider,
+                    'method'        => 'generate_image',
+                    'error_message' => $result->get_error_message()
+                ));
+            }
         }
 
         return $result;
@@ -253,6 +307,23 @@ class AT_AI_Manager {
 
         if (!is_wp_error($result)) {
             $this->usage_tracker->track_usage($this->active_provider, 'image_analysis', $result);
+
+            // Emit suite event
+            if (function_exists('at_ai_suite_emit')) {
+                at_ai_suite_emit('ai_image_analyzed', array(
+                    'provider'  => $this->active_provider,
+                    'image_url' => $image_url
+                ));
+            }
+        } else {
+            // Emit error event
+            if (function_exists('at_ai_suite_emit')) {
+                at_ai_suite_emit('ai_error', array(
+                    'provider'      => $this->active_provider,
+                    'method'        => 'analyze_image',
+                    'error_message' => $result->get_error_message()
+                ));
+            }
         }
 
         return $result;
@@ -279,7 +350,25 @@ class AT_AI_Manager {
 
         if (!is_wp_error($result)) {
             $this->usage_tracker->track_usage($this->active_provider, 'translation', $result);
+
+            // Emit suite event
+            if (function_exists('at_ai_suite_emit')) {
+                at_ai_suite_emit('ai_text_translated', array(
+                    'provider'        => $this->active_provider,
+                    'target_language' => $target_language
+                ));
+            }
+
             return $result['text'];
+        } else {
+            // Emit error event
+            if (function_exists('at_ai_suite_emit')) {
+                at_ai_suite_emit('ai_error', array(
+                    'provider'      => $this->active_provider,
+                    'method'        => 'translate_text',
+                    'error_message' => $result->get_error_message()
+                ));
+            }
         }
 
         return $result;
@@ -340,7 +429,27 @@ class AT_AI_Manager {
 
         if (!is_wp_error($result)) {
             $this->usage_tracker->track_usage($this->active_provider, 'tagging', $result);
-            return $this->parse_tags_from_response($result['text']);
+            
+            $tags = $this->parse_tags_from_response($result['text']);
+
+            // Emit suite event
+            if (function_exists('at_ai_suite_emit')) {
+                at_ai_suite_emit('ai_tags_generated', array(
+                    'provider'   => $this->active_provider,
+                    'tags_count' => count($tags['tags']) + count($tags['categories'])
+                ));
+            }
+
+            return $tags;
+        } else {
+            // Emit error event
+            if (function_exists('at_ai_suite_emit')) {
+                at_ai_suite_emit('ai_error', array(
+                    'provider'      => $this->active_provider,
+                    'method'        => 'generate_tags',
+                    'error_message' => $result->get_error_message()
+                ));
+            }
         }
 
         return $result;

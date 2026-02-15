@@ -115,6 +115,11 @@ class AT_WordPress_AI_Assistant_Core {
         require_once WORDPRESS_AI_ASSISTANT_PATH . 'includes/functions.php';
 
         /**
+         * Suite Adapter - Bridge to AT Agency Manager Suite Core
+         */
+        require_once WORDPRESS_AI_ASSISTANT_PATH . 'includes/suite-adapter.php';
+
+        /**
          * Dependency Checker - Check for required and recommended dependencies
          */
         require_once WORDPRESS_AI_ASSISTANT_PATH . 'includes/class-dependency-checker.php';
@@ -179,6 +184,17 @@ class AT_WordPress_AI_Assistant_Core {
         require_once WORDPRESS_AI_ASSISTANT_PATH . 'public/class-public.php';
 
         $this->loader = new AT_WordPress_AI_Assistant_Loader();
+
+        // Register AI Manager as a suite service if Suite Core is available
+        add_action('at_suite_core_booted', function() {
+            if (function_exists('at_suite_register_service')) {
+                at_suite_register_service('ai_manager', AT_AI_Manager::get_instance(), array(
+                    'owner'        => 'wordpress-ai-assistant',
+                    'version'      => $this->get_version(),
+                    'capabilities' => array('text_generation', 'chat', 'image_analysis', 'translation'),
+                ));
+            }
+        });
     }
 
     /**
