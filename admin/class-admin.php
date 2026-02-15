@@ -151,6 +151,25 @@ class AT_WordPress_AI_Assistant_Admin {
                 ),
             ));
         }
+        
+        // Add footer credit
+        add_filter('admin_footer_text', array($this, 'admin_footer_text'));
+    }
+
+    /**
+     * Add footer credit
+     */
+    public function admin_footer_text($text) {
+        // Check if we are on a plugin page
+        $screen = get_current_screen();
+        if ($screen && strpos($screen->id, 'wordpress-ai-assistant') !== false) {
+            if (function_exists('at_suite_render_admin_footer')) {
+                ob_start();
+                at_suite_render_admin_footer();
+                return ob_get_clean();
+            }
+        }
+        return $text;
     }
 
     /**
