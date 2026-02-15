@@ -5,6 +5,11 @@
 התיעוד בקובץ זה עוקב אחר הכללים של [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 וגרסאות הפרויקט עוקבות אחר [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2026-02-15
+
+### UI/UX
+- הוספת תגית "AT Suite Member" בעמוד התוספים
+
 ## [1.5.0] - 2026-02-15
 
 ### UI/UX
