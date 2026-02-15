@@ -5,6 +5,14 @@
 התיעוד בקובץ זה עוקב אחר הכללים של [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 וגרסאות הפרויקט עוקבות אחר [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-02-15
+
+### Suite Integration
+- חיבור ל-AT Agency Manager Suite Core דרך Adapter
+- רישום שירות `ai_manager` ב-Suite Core
+- שידור אירועי AI (Text, Image, Chat, Translation, Tags) ל-Suite Core
+- תמיכה ב-Fallback כאשר Suite Core אינו זמין
+
 ## [1.3.0] - 2024-12-08
 
 ### הוספות 🎉
