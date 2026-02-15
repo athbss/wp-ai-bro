@@ -144,7 +144,7 @@ jobs:
       - name: Checkout Railway CDN repo
         uses: actions/checkout@v4
         with:
-          repository: ${{ secrets.RAILWAY_CDN_REPO }}  # e.g., amit-trabelsi/wp-plugins-cdn
+          repository: ${{ secrets.RAILWAY_CDN_REPO }}  # amit-trabelsi-digital/wp-plugins-cdn
           token: ${{ secrets.RAILWAY_CDN_TOKEN }}
           path: cdn-server
 
