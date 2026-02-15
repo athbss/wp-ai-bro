@@ -14,7 +14,7 @@
  * Tested up to: 6.4
  * Requires PHP: 7.4
  * Network: false
- * Update URI: https://raw.githubusercontent.com/athbss/wp-ai-bro/main/plugin-info.json
+ * Update URI: https://updates.amiteam.io/wordpress-ai-assistant/plugin-info.json
  */
 
 // If this file is called directly, abort.
