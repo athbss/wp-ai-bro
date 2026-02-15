@@ -64,10 +64,20 @@ class AT_WordPress_AI_Assistant_Admin {
      * @since    1.0.0
      */
     public function enqueue_styles() {
+        // Enqueue Suite Tokens if available (AT Agency Manager is active)
+        if (defined('AT_AGENCY_MANAGER_URL')) {
+             wp_enqueue_style(
+                'at-suite-tokens',
+                AT_AGENCY_MANAGER_URL . 'assets/css/suite-tokens.css',
+                array(),
+                defined('AT_AGENCY_MANAGER_VERSION') ? AT_AGENCY_MANAGER_VERSION : '1.0.0'
+            );
+        }
+
         wp_enqueue_style(
             $this->plugin_name,
             WORDPRESS_AI_ASSISTANT_URL . 'admin/css/admin.css',
-            array(),
+            defined('AT_AGENCY_MANAGER_URL') ? array('at-suite-tokens') : array(),
             $this->version,
             'all'
         );
