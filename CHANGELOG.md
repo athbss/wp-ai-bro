@@ -5,6 +5,12 @@
 התיעוד בקובץ זה עוקב אחר הכללים של [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 וגרסאות הפרויקט עוקבות אחר [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-02-15
+
+### UI/UX
+- טעינת Design Tokens מה-Suite Core למראה אחיד
+- תמיכה ב-Fallback ל-Tokens מקומיים
+
 ## [1.4.0] - 2026-02-15
 
 ### Suite Integration
