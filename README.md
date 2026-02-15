@@ -64,6 +64,30 @@
 - סטטיסטיקות שימוש מפורטות
 - ניתוח עלויות לאורך זמן
 
+## 🧩 AT Agency Suite Integration
+
+תוסף זה הוא חלק מ-**AT Agency Suite Ecosystem**.
+כאשר הוא מותקן לצד **AT Agency Sites Manager**, הוא מספק אינטגרציה עמוקה:
+
+### תכונות אינטגרציה
+- **רישום שירות**: חושף את `ai_manager` כשירות זמין לתוספים אחרים בסוויטה
+- **אירועים**: משדר אירועים לכל פעולת AI (יצירת טקסט, תמונה, צ'אט, תרגום)
+- **הגדרות**: משתלב במערכת ההגדרות המרכזית של הסוויטה
+- **עיצוב**: משתמש ב-Design Tokens המשותפים למראה אחיד
+
+### אירועים זמינים (Events)
+- `ai_text_generated` - יצירת טקסט הושלמה
+- `ai_chat_completed` - שיחת צ'אט הושלמה
+- `ai_image_generated` - יצירת תמונה הושלמה
+- `ai_image_analyzed` - ניתוח תמונה הושלם
+- `ai_text_translated` - תרגום טקסט הושלם
+- `ai_tags_generated` - תיוג אוטומטי הושלם
+- `ai_error` - שגיאה בפעולת AI
+
+### Fallback
+התוסף פועל באופן מלא ועצמאי גם ללא AT Agency Sites Manager.
+כאשר הסוויטה אינה זמינה, התוסף משתמש במנגנוני Fallback פנימיים.
+
 ## 📦 התקנה
 
 1. העלה את תיקיית התוסף לתיקיית `/wp-content/plugins/`
