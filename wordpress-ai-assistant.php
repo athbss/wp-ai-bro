@@ -78,6 +78,16 @@ require WORDPRESS_AI_ASSISTANT_PATH . 'includes/class-core.php';
 function at_run_wordpress_ai_assistant() {
     $plugin = new AT_WordPress_AI_Assistant_Core();
     $plugin->run();
+
+    // Add suite badge to plugin row
+    add_filter('plugin_row_meta', function($meta, $plugin_file) {
+        if ($plugin_file === WORDPRESS_AI_ASSISTANT_BASENAME) {
+            if (function_exists('at_is_suite_core_active') && at_is_suite_core_active()) {
+                $meta[] = '<span style="color: var(--at-color-primary, #4ec5e0); font-weight: 600;">AT Suite Member</span>';
+            }
+        }
+        return $meta;
+    }, 10, 2);
 }
 
 at_run_wordpress_ai_assistant();
