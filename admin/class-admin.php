@@ -960,7 +960,19 @@ class AT_WordPress_AI_Assistant_Admin {
      */
     public function display_usage_page() {
         $usage_tracker = $this->ai_manager->get_usage_stats('month');
-        $cost_summary = $this->ai_manager->get_cost_summary('month');
+        
+        // Safe check for get_cost_summary method
+        if (method_exists($this->ai_manager, 'get_cost_summary')) {
+            $cost_summary = $this->ai_manager->get_cost_summary('month');
+        } else {
+            // Fallback if method doesn't exist
+            $cost_summary = array(
+                'providers' => array(),
+                'total_cost' => 0,
+                'total_tokens' => 0,
+                'total_requests' => 0,
+            );
+        }
         ?>
         <div class="wrap">
             <h1><?php _e('שימוש ועלויות AI', 'wordpress-ai-assistant'); ?></h1>

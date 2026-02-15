@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:plugins.trac.wordpress.org)",
+      "Bash(grep:*)",
+      "Bash(wp option get:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
