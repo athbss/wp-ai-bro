@@ -155,12 +155,7 @@ class AT_WordPress_AI_Assistant_Public {
 
         try {
             $auto_tagger = new AT_Auto_Tagger();
-            $tags = $auto_tagger->generate_tags($post->post_content, $post->post_title);
-            
-            if (!empty($tags) && !is_wp_error($tags)) {
-                wp_set_post_tags($post_id, $tags, false);
-                at_ai_assistant_log('auto_tag', 'success', sprintf(__('Auto-tagged with: %s', 'wordpress-ai-assistant'), implode(', ', $tags)), array('tags' => $tags), $post_id);
-            }
+            $auto_tagger->auto_tag_post($post_id, $post);
         } catch (Exception $e) {
             at_ai_assistant_log('auto_tag', 'error', $e->getMessage(), array('error' => $e->getMessage()), $post_id);
         }
@@ -187,17 +182,14 @@ class AT_WordPress_AI_Assistant_Public {
         }
 
         try {
-            $image_url = wp_get_attachment_image_url($attachment_id, 'full');
-            if (!$image_url) {
-                return;
-            }
-
             $alt_generator = new AT_Image_Alt_Generator();
-            $alt_text = $alt_generator->generate_alt_text($image_url);
-            
-            if (!empty($alt_text) && !is_wp_error($alt_text)) {
-                update_post_meta($attachment_id, '_wp_attachment_image_alt', $alt_text);
-                at_ai_assistant_log('image_alt', 'success', sprintf(__('Generated alt text: %s', 'wordpress-ai-assistant'), $alt_text), array('alt_text' => $alt_text), null, null);
+            $result = $alt_generator->generate_alt_text($attachment_id);
+
+            if (!is_wp_error($result)) {
+                $alt_text = get_post_meta($attachment_id, '_wp_attachment_image_alt', true);
+                if (!empty($alt_text)) {
+                    at_ai_assistant_log('image_alt', 'success', sprintf(__('Generated alt text: %s', 'wordpress-ai-assistant'), $alt_text), array('alt_text' => $alt_text), $attachment_id, null);
+                }
             }
         } catch (Exception $e) {
             at_ai_assistant_log('image_alt', 'error', $e->getMessage(), array('error' => $e->getMessage()), null, null);
@@ -307,4 +299,3 @@ class AT_WordPress_AI_Assistant_Public {
         ));
     }
 }
-

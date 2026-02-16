@@ -165,13 +165,24 @@ class AT_Auto_Tagger {
         // Apply tags
         $this->apply_generated_tags($object_id, $object, $tags);
 
+        $applied_total = 0;
+        if (!empty($tags['taxonomies']) && is_array($tags['taxonomies'])) {
+            foreach ($tags['taxonomies'] as $taxonomy_terms) {
+                if (is_array($taxonomy_terms)) {
+                    $applied_total += count($taxonomy_terms);
+                }
+            }
+        } else {
+            $applied_total += count($tags['tags'] ?? array());
+            $applied_total += count($tags['categories'] ?? array());
+        }
+
         // Mark as processed
         update_post_meta($object_id, '_at_ai_tags_generated', time());
 
         at_ai_assistant_log('auto_tagging', 'success', __('Tags generated and applied successfully', 'wordpress-ai-assistant'), array(
             'object_id' => $object_id,
-            'tags_applied' => count($tags['tags'] ?? array()),
-            'categories_applied' => count($tags['categories'] ?? array()),
+            'terms_applied' => $applied_total,
         ), $object_id);
     }
 
@@ -218,24 +229,27 @@ class AT_Auto_Tagger {
      */
     private function get_available_taxonomies($post_type) {
         $taxonomies = array();
+        $selected_taxonomies = $this->get_selected_taxonomies($post_type);
 
         // Get all taxonomies for this post type
         $post_taxonomies = get_object_taxonomies($post_type, 'objects');
 
         foreach ($post_taxonomies as $taxonomy) {
-            if ($taxonomy->public && !$taxonomy->hierarchical) {
-                // Get existing terms
-                $terms = get_terms(array(
-                    'taxonomy' => $taxonomy->name,
-                    'hide_empty' => false,
-                    'number' => 20, // Limit to prevent too many terms
-                ));
+            if (!$taxonomy->public || !in_array($taxonomy->name, $selected_taxonomies, true)) {
+                continue;
+            }
 
-                if (!is_wp_error($terms) && !empty($terms)) {
-                    $taxonomies[$taxonomy->name] = array();
-                    foreach ($terms as $term) {
-                        $taxonomies[$taxonomy->name][] = $term->name;
-                    }
+            // Get existing terms
+            $terms = get_terms(array(
+                'taxonomy' => $taxonomy->name,
+                'hide_empty' => false,
+                'number' => 30,
+            ));
+
+            $taxonomies[$taxonomy->name] = array();
+            if (!is_wp_error($terms) && !empty($terms)) {
+                foreach ($terms as $term) {
+                    $taxonomies[$taxonomy->name][] = $term->name;
                 }
             }
         }
@@ -251,17 +265,25 @@ class AT_Auto_Tagger {
      * @param array $tags
      */
     private function apply_generated_tags($object_id, $object, $tags) {
-        // Apply regular tags
-        if (!empty($tags['tags']) && is_array($tags['tags'])) {
-            $current_tags = wp_get_post_tags($object_id, array('fields' => 'names'));
-            $new_tags = array_unique(array_merge($current_tags, $tags['tags']));
+        $selected_taxonomies = $this->get_selected_taxonomies($object->post_type);
 
-            wp_set_post_tags($object_id, $new_tags);
-        }
+        // Preferred format: explicit taxonomy map from AI.
+        if (!empty($tags['taxonomies']) && is_array($tags['taxonomies'])) {
+            foreach ($tags['taxonomies'] as $taxonomy => $terms) {
+                if (!in_array($taxonomy, $selected_taxonomies, true)) {
+                    continue;
+                }
+                $this->apply_taxonomy_terms($object_id, $object->post_type, $taxonomy, $terms);
+            }
+        } else {
+            // Backward compatibility for legacy keys.
+            if (!empty($tags['tags']) && is_array($tags['tags']) && in_array('post_tag', $selected_taxonomies, true)) {
+                $this->apply_taxonomy_terms($object_id, $object->post_type, 'post_tag', $tags['tags']);
+            }
 
-        // Apply categories
-        if (!empty($tags['categories']) && is_array($tags['categories'])) {
-            $this->apply_categories($object_id, $tags['categories']);
+            if (!empty($tags['categories']) && is_array($tags['categories']) && in_array('category', $selected_taxonomies, true)) {
+                $this->apply_taxonomy_terms($object_id, $object->post_type, 'category', $tags['categories']);
+            }
         }
 
         // Store AI-generated metadata
@@ -269,33 +291,43 @@ class AT_Auto_Tagger {
     }
 
     /**
-     * Apply categories to post
+     * Apply terms to a taxonomy.
      *
-     * @param int $post_id
-     * @param array $categories
+     * @param int $object_id
+     * @param string $post_type
+     * @param string $taxonomy
+     * @param array $terms
      */
-    private function apply_categories($post_id, $categories) {
-        $category_ids = array();
+    private function apply_taxonomy_terms($object_id, $post_type, $taxonomy, $terms) {
+        if (!taxonomy_exists($taxonomy) || !is_object_in_taxonomy($post_type, $taxonomy)) {
+            return;
+        }
 
-        foreach ($categories as $category_name) {
-            $category_name = trim($category_name);
+        if (!is_array($terms) || empty($terms)) {
+            return;
+        }
 
-            // Try to find existing category
-            $existing_category = get_term_by('name', $category_name, 'category');
+        $term_ids = array();
+        foreach ($terms as $term_name) {
+            $term_name = trim((string) $term_name);
+            if ($term_name === '') {
+                continue;
+            }
 
-            if ($existing_category) {
-                $category_ids[] = $existing_category->term_id;
-            } else {
-                // Create new category
-                $new_category = wp_insert_term($category_name, 'category');
-                if (!is_wp_error($new_category)) {
-                    $category_ids[] = $new_category['term_id'];
-                }
+            $existing_term = get_term_by('name', $term_name, $taxonomy);
+            if ($existing_term && !is_wp_error($existing_term)) {
+                $term_ids[] = (int) $existing_term->term_id;
+                continue;
+            }
+
+            $created_term = wp_insert_term($term_name, $taxonomy);
+            if (!is_wp_error($created_term) && !empty($created_term['term_id'])) {
+                $term_ids[] = (int) $created_term['term_id'];
             }
         }
 
-        if (!empty($category_ids)) {
-            wp_set_post_categories($post_id, $category_ids, true); // true = append
+        if (!empty($term_ids)) {
+            wp_set_object_terms($object_id, array_values(array_unique($term_ids)), $taxonomy, true);
         }
     }
 
@@ -583,6 +615,7 @@ class AT_Auto_Tagger {
     public function register_settings() {
         register_setting('at_ai_assistant_settings', 'at_ai_assistant_auto_tagging_enabled');
         register_setting('at_ai_assistant_settings', 'at_ai_assistant_auto_tag_media_enabled');
+        register_setting('at_ai_assistant_settings', 'at_ai_assistant_tagging_taxonomies');
 
         add_settings_field(
             'auto_tagging_enabled',
@@ -596,6 +629,14 @@ class AT_Auto_Tagger {
             'auto_tag_media_enabled',
             __('Auto Tag Media', 'wordpress-ai-assistant'),
             array($this, 'render_auto_tag_media_setting'),
+            'at_ai_assistant_settings',
+            'at_ai_assistant_general'
+        );
+
+        add_settings_field(
+            'tagging_taxonomies',
+            __('Tagging Taxonomies', 'wordpress-ai-assistant'),
+            array($this, 'render_tagging_taxonomies_setting'),
             'at_ai_assistant_settings',
             'at_ai_assistant_general'
         );
@@ -631,5 +672,57 @@ class AT_Auto_Tagger {
             <?php _e('When enabled, AI will analyze uploaded images and generate relevant tags based on image content.', 'wordpress-ai-assistant'); ?>
         </p>
         <?php
+    }
+
+    /**
+     * Render taxonomy selection setting.
+     */
+    public function render_tagging_taxonomies_setting() {
+        $selected = at_ai_assistant_get_option('tagging_taxonomies', array());
+        if (!is_array($selected)) {
+            $selected = array();
+        }
+
+        $public_taxonomies = get_taxonomies(array('public' => true), 'objects');
+        ?>
+        <fieldset>
+            <?php foreach ($public_taxonomies as $taxonomy): ?>
+                <label style="display: block; margin-bottom: 6px;">
+                    <input type="checkbox"
+                           name="at_ai_assistant_tagging_taxonomies[]"
+                           value="<?php echo esc_attr($taxonomy->name); ?>"
+                           <?php checked(in_array($taxonomy->name, $selected, true)); ?>>
+                    <?php echo esc_html($taxonomy->label . ' (' . $taxonomy->name . ')'); ?>
+                </label>
+            <?php endforeach; ?>
+        </fieldset>
+        <p class="description">
+            <?php _e('Choose which taxonomies AI can tag. If none are selected, all public taxonomies for the post type will be used.', 'wordpress-ai-assistant'); ?>
+        </p>
+        <?php
+    }
+
+    /**
+     * Get selected taxonomies for a post type.
+     *
+     * @param string $post_type
+     * @return array
+     */
+    private function get_selected_taxonomies($post_type) {
+        $post_taxonomies = get_object_taxonomies($post_type, 'objects');
+        $available = array();
+        foreach ($post_taxonomies as $taxonomy) {
+            if ($taxonomy->public) {
+                $available[] = $taxonomy->name;
+            }
+        }
+
+        $selected = at_ai_assistant_get_option('tagging_taxonomies', array());
+        if (!is_array($selected) || empty($selected)) {
+            return $available;
+        }
+
+        $selected = array_map('sanitize_key', $selected);
+        return array_values(array_intersect($available, $selected));
     }
 }

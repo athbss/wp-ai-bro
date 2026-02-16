@@ -480,10 +480,19 @@ class AT_AI_Manager {
             }
         }
 
-        $prompt .= "\n" . __('Suggest tags and categories in the following format:', 'wordpress-ai-assistant') . "\n";
-        $prompt .= __('Tags:', 'wordpress-ai-assistant') . " tag1, tag2, tag3\n";
-        $prompt .= __('Categories:', 'wordpress-ai-assistant') . " category1, category2\n";
-        $prompt .= __('Target Audience:', 'wordpress-ai-assistant') . " audience1, audience2";
+        $prompt .= "\n" . __('Return ONLY valid JSON. Do not add any text before or after JSON.', 'wordpress-ai-assistant') . "\n";
+        $prompt .= "{\n";
+        $prompt .= '  "taxonomies": {' . "\n";
+        $prompt .= '    "post_tag": ["tag1", "tag2"],' . "\n";
+        $prompt .= '    "category": ["category1"]' . "\n";
+        $prompt .= "  },\n";
+        $prompt .= '  "audience": ["audience1", "audience2"]' . "\n";
+        $prompt .= "}\n\n";
+        $prompt .= __('Rules:', 'wordpress-ai-assistant') . "\n";
+        $prompt .= "- " . __('Prefer terms from available taxonomies list when relevant.', 'wordpress-ai-assistant') . "\n";
+        $prompt .= "- " . __('Only include taxonomies that are provided in the available taxonomies list.', 'wordpress-ai-assistant') . "\n";
+        $prompt .= "- " . __('If a taxonomy has no suitable terms, return an empty array for it.', 'wordpress-ai-assistant') . "\n";
+        $prompt .= "- " . __('Keep terms concise and avoid duplicates.', 'wordpress-ai-assistant');
 
         return $prompt;
     }
@@ -498,25 +507,124 @@ class AT_AI_Manager {
         $tags = array(
             'tags' => array(),
             'categories' => array(),
-            'audience' => array()
+            'audience' => array(),
+            'taxonomies' => array(),
         );
 
-        $lines = explode("\n", $response);
-
-        foreach ($lines as $line) {
-            if (strpos($line, 'Tags:') === 0) {
-                $tags_str = str_replace('Tags:', '', $line);
-                $tags['tags'] = array_map('trim', explode(',', $tags_str));
-            } elseif (strpos($line, 'Categories:') === 0) {
-                $cats_str = str_replace('Categories:', '', $line);
-                $tags['categories'] = array_map('trim', explode(',', $cats_str));
-            } elseif (strpos($line, 'Target Audience:') === 0) {
-                $aud_str = str_replace('Target Audience:', '', $line);
-                $tags['audience'] = array_map('trim', explode(',', $aud_str));
+        // Preferred path: parse JSON response.
+        $decoded = json_decode(trim($response), true);
+        if (!is_array($decoded)) {
+            // Handle extra text before/after JSON.
+            $start = strpos($response, '{');
+            $end = strrpos($response, '}');
+            if ($start !== false && $end !== false && $end > $start) {
+                $decoded = json_decode(substr($response, $start, $end - $start + 1), true);
             }
         }
 
+        if (is_array($decoded)) {
+            if (!empty($decoded['taxonomies']) && is_array($decoded['taxonomies'])) {
+                foreach ($decoded['taxonomies'] as $taxonomy => $terms) {
+                    if (!is_string($taxonomy) || !is_array($terms)) {
+                        continue;
+                    }
+                    $sanitized_terms = $this->sanitize_term_list($terms);
+                    if (!empty($sanitized_terms)) {
+                        $tags['taxonomies'][$taxonomy] = $sanitized_terms;
+                    }
+                }
+            }
+
+            if (!empty($decoded['tags']) && is_array($decoded['tags'])) {
+                $tags['tags'] = $this->sanitize_term_list($decoded['tags']);
+            }
+
+            if (!empty($decoded['categories']) && is_array($decoded['categories'])) {
+                $tags['categories'] = $this->sanitize_term_list($decoded['categories']);
+            }
+
+            if (!empty($decoded['audience']) && is_array($decoded['audience'])) {
+                $tags['audience'] = $this->sanitize_term_list($decoded['audience']);
+            }
+
+            // Backward compatibility: mirror common taxonomies.
+            if (empty($tags['tags']) && !empty($tags['taxonomies']['post_tag'])) {
+                $tags['tags'] = $tags['taxonomies']['post_tag'];
+            }
+            if (empty($tags['categories']) && !empty($tags['taxonomies']['category'])) {
+                $tags['categories'] = $tags['taxonomies']['category'];
+            }
+
+            return $tags;
+        }
+
+        // Fallback path for non-JSON models: tolerant parsing for EN/HE labels.
+        $lines = explode("\n", $response);
+
+        foreach ($lines as $line) {
+            $line = trim(ltrim($line, "-* \t"));
+            if ($line === '') {
+                continue;
+            }
+
+            if (preg_match('/^(Tags|תגיות)\s*:\s*(.+)$/iu', $line, $matches)) {
+                $tags['tags'] = $this->sanitize_term_list(explode(',', $matches[2]));
+                continue;
+            }
+
+            if (preg_match('/^(Categories|קטגוריות)\s*:\s*(.+)$/iu', $line, $matches)) {
+                $tags['categories'] = $this->sanitize_term_list(explode(',', $matches[2]));
+                continue;
+            }
+
+            if (preg_match('/^(Target Audience|Audience|קהל יעד)\s*:\s*(.+)$/iu', $line, $matches)) {
+                $tags['audience'] = $this->sanitize_term_list(explode(',', $matches[2]));
+                continue;
+            }
+
+            // Generic taxonomy line: taxonomy_slug: term1, term2
+            if (preg_match('/^([a-z0-9_\-]+)\s*:\s*(.+)$/i', $line, $matches)) {
+                $taxonomy = sanitize_key($matches[1]);
+                $terms = $this->sanitize_term_list(explode(',', $matches[2]));
+                if (!empty($taxonomy) && !empty($terms)) {
+                    $tags['taxonomies'][$taxonomy] = $terms;
+                }
+            }
+        }
+
+        if (empty($tags['tags']) && !empty($tags['taxonomies']['post_tag'])) {
+            $tags['tags'] = $tags['taxonomies']['post_tag'];
+        }
+        if (empty($tags['categories']) && !empty($tags['taxonomies']['category'])) {
+            $tags['categories'] = $tags['taxonomies']['category'];
+        }
+
         return $tags;
+    }
+
+    /**
+     * Sanitize a terms list.
+     *
+     * @param array $terms
+     * @return array
+     */
+    private function sanitize_term_list($terms) {
+        if (!is_array($terms)) {
+            return array();
+        }
+
+        $sanitized = array();
+        foreach ($terms as $term) {
+            if (!is_scalar($term)) {
+                continue;
+            }
+            $clean = trim(wp_strip_all_tags((string) $term));
+            if ($clean !== '') {
+                $sanitized[] = $clean;
+            }
+        }
+
+        return array_values(array_unique($sanitized));
     }
 
     /**
