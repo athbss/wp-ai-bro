@@ -93,7 +93,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: ${{ env.CDN_REPOSITORY }}
-          token: ${{ secrets.AT_CDN_REPO_TOKEN }}
+          ssh-key: ${{ secrets.AT_CDN_DEPLOY_KEY }}
           path: cdn
 
       - name: Publish package and manifest to CDN
