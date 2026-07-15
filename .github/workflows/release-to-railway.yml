@@ -109,7 +109,12 @@ jobs:
             git config user.email "actions@users.noreply.github.com"
             git add "public/${PLUGIN_SLUG}/${PLUGIN_SLUG}.zip" "public/${PLUGIN_SLUG}/plugin-info.json"
             git commit -m "publish(${PLUGIN_SLUG}): v${VERSION}"
-            git push origin main
+            for attempt in $(seq 1 3); do
+              git push origin main && exit 0
+              git pull --rebase origin main
+            done
+            echo "Unable to publish after concurrent CDN updates" >&2
+            exit 1
           )
 
       - name: Verify public CDN release
