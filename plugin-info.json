@@ -1,24 +1,28 @@
 {
+  "schema_version": 1,
   "name": "WordPress AI Assistant",
-  "version": "1.3.0",
-  "download_url": "https://github.com/athbss/wp-ai-bro/releases/download/v1.3.0/wordpress-ai-assistant-1.3.0.zip",
-  "requires": "5.0",
-  "tested": "6.6",
+  "slug": "wordpress-ai-assistant",
+  "plugin_file": "wordpress-ai-assistant/wordpress-ai-assistant.php",
+  "version": "1.8.3",
+  "author": "Amit Trabelsi",
+  "author_profile": "https://amit-trabelsi.co.il",
+  "homepage": "https://github.com/athbss/wp-ai-bro",
+  "requires": "5.8",
+  "tested": "6.8",
   "requires_php": "7.4",
+  "last_updated": "2026-07-15 00:00:00",
+  "package": "https://updates.amiteam.io/wordpress-ai-assistant/download",
+  "download_url": "https://updates.amiteam.io/wordpress-ai-assistant/download",
   "sections": {
-    "description": "תוסף WordPress מתקדם המספק יכולות בינה מלאכותית לשיפור תהליכי יצירת תוכן, נגישות וחוויית המשתמש. כולל כפתורי AI בממשק המדיה, תיוג אוטומטי חכם ואופטימיזציה SEO/AEO.",
-    "changelog": "<h4>1.3.0</h4><ul><li>🎉 <strong>Media AI Generator</strong> - כפתורי AI בממשק המדיה (כותרות, תיאורים, alt text, כיתובים)</li><li>🏷️ <strong>תיוג אוטומטי מתקדם</strong> - בחירה חכמה מתוך טקסונומיות קיימות (Tags, Categories, Custom Taxonomies)</li><li>🔍 <strong>אופטימיזציה SEO/AEO</strong> - שיפור תוכן למנועי חיפוש ומנועי תשובות AI (ChatGPT, Perplexity)</li><li>📊 <strong>Logging משופר</strong> - תיעוד מלא של פרומפטים, תשובות וטוקנים</li><li>🎨 UI מעוצב עם gradient buttons ואנימציות</li><li>🌐 תמיכה מלאה ב-RTL ועברית</li><li>⚡ אופטימיזציה של כמות טוקנים לחיסכון בעלויות</li></ul><h4>1.2.1</h4><ul><li>עדכון מחירי מודלים לדצמבר 2025 (מדויקים)</li><li>הוספת אייקוני מהירות ועלות לרשימת מודלים (⚡💰💎)</li><li>עדכון ברירות מחדל למודלים מאוזנים יותר</li><li>הוספת MODEL-RECOMMENDATIONS.md - מדריך המלצות מפורט</li><li>הוספת תמיכה ב-modalities (text/image/video/audio)</li><li>ייעול רשימת מודלים - הסרת deprecated</li></ul><h4>1.2.0</h4><ul><li>עדכון מודלים: GPT-5.1, Claude Opus 4.5, Gemini 3 Pro</li><li>תמיכה ביצירת תמונות (Gemini 2.5 Flash Image)</li><li>שדות הנחיות כלליות ושפה גרפית</li><li>תמיכה מלאה באתרים רב-לשוניים (WPML/Polylang)</li><li>זיהוי אוטומטי של שפת הפריט</li><li>תמיכה מלאה בעברית בממשק (80+ מחרוזות)</li></ul><h4>1.1.0</h4><ul><li>תשתית AI מלאה עם תמיכה במספר ספקים</li><li>יצירת תיאור אלטרנטיבי לתמונות אוטומטית</li><li>יכולות תרגום טקסט עם הקשר</li><li>תיוג וקטלוג אוטומטי</li><li>בקרת עלויות וספירת טוקנים</li></ul>"
+    "description": "תוסף WordPress מתקדם המספק יכולות בינה מלאכותית לשיפור תהליכי יצירת תוכן, נגישות וחוויית המשתמש.",
+    "changelog": "<h4>1.8.3</h4><ul><li>הוספת עדכון אוטומטי דרך ה-CDN הפרטי של AT.</li></ul>"
   },
-  "plugin": {
-    "version": "1.3.0",
-    "download_url": "https://github.com/athbss/wp-ai-bro/releases/download/v1.3.0/wordpress-ai-assistant-1.3.0.zip",
-    "last_updated": "2024-12-08 15:00:00",
-    "name": "WordPress AI Assistant",
-    "slug": "wordpress-ai-assistant",
-    "author": "Amit Trabelsi",
-    "author_profile": "https://amit-trabelsi.co.il",
-    "requires": "5.0",
-    "tested": "6.6",
-    "channel": "stable"
+  "banners": {
+    "low": "",
+    "high": ""
+  },
+  "icons": {
+    "1x": "",
+    "2x": ""
   }
 }

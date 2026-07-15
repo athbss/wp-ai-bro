@@ -30,6 +30,7 @@ package-lock.json
 # IDE files
 .vscode/
 .idea/
+.claude/
 *.swp
 *.swo
 *~
@@ -44,6 +45,7 @@ Thumbs.db
 
 # Testing files
 tests/
+test-*.php
 phpunit.xml
 codeception.yml
 wp-tests-config.php

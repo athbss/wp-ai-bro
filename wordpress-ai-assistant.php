@@ -3,7 +3,7 @@
  * Plugin Name: WordPress AI Assistant
  * Plugin URI: https://github.com/athbss/wp-ai-bro
  * Description: תוסף WordPress מתקדם המספק יכולות בינה מלאכותית לשיפור תהליכי יצירת תוכן, נגישות וחוויית המשתמש
- * Version: 1.8.2
+ * Version: 1.8.3
  * Author: Amit Trabelsi
  * Author URI: https://amit-trabelsi.co.il
  * License: GPL v2 or later
@@ -25,7 +25,7 @@ if (!defined('WPINC')) {
 /**
  * Currently plugin version.
  */
-define('WORDPRESS_AI_ASSISTANT_VERSION', '1.8.2');
+define('WORDPRESS_AI_ASSISTANT_VERSION', '1.8.3');
 
 /**
  * Plugin directory path
@@ -71,11 +71,20 @@ register_deactivation_hook(__FILE__, 'at_deactivate_wordpress_ai_assistant');
  * admin-specific hooks, and public-facing site hooks.
  */
 require WORDPRESS_AI_ASSISTANT_PATH . 'includes/class-core.php';
+require_once WORDPRESS_AI_ASSISTANT_PATH . 'includes/class-private-cdn-updater.php';
 
 /**
  * Begins execution of the plugin.
  */
 function at_run_wordpress_ai_assistant() {
+    new AT_AI_Private_CDN_Updater(array(
+        'slug'            => 'wordpress-ai-assistant',
+        'plugin_file'     => WORDPRESS_AI_ASSISTANT_BASENAME,
+        'current_version' => WORDPRESS_AI_ASSISTANT_VERSION,
+        'manifest_url'    => 'https://updates.amiteam.io/wordpress-ai-assistant/plugin-info.json',
+        'details_url'     => 'https://updates.amiteam.io/wordpress-ai-assistant/plugin-info.json',
+    ));
+
     $plugin = new AT_WordPress_AI_Assistant_Core();
     $plugin->run();
 

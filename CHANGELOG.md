@@ -5,6 +5,12 @@
 התיעוד בקובץ זה עוקב אחר הכללים של [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 וגרסאות הפרויקט עוקבות אחר [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.3] - 2026-07-15
+
+### Infrastructure
+- הוספת updater תואם WordPress 5.8+ לקבלת עדכונים מה-CDN הפרטי של AT
+- תמיכה ב-manifest האחיד של ה-CDN ובפורמט legacy במהלך מעבר גרסאות
+
 ## [1.8.2] - 2026-02-16
 
 ### Fixes
