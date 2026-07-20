@@ -100,8 +100,14 @@
         var fieldType = $button.data('field-type');
         var attachmentId = $button.data('attachment-id');
 
-        // Find the input field
-        var $field = findFieldByType(fieldType);
+        // Find the input field. Prefer the field this button is attached to
+        // (buttons are inserted directly after their field), which is reliable
+        // even when a broad selector would match the wrong element in the media
+        // modal. Fall back to a type-based lookup.
+        var $field = $button.prevAll('input, textarea').first();
+        if (!$field.length) {
+            $field = findFieldByType(fieldType);
+        }
         if (!$field || !$field.length) {
             alert('שדה לא נמצא');
             return;
@@ -133,7 +139,22 @@
             success: function(response) {
                 if (response.success) {
                     var content = extractContent(response.data, fieldType);
-                    $field.val(content).trigger('change');
+                    // Set the value, then notify WordPress/media listeners.
+                    // Guard the change trigger so a third-party handler that
+                    // throws (e.g. WooCommerce wc-tracks on product screens)
+                    // can't abort the update, and dispatch a native input event
+                    // so WordPress reliably persists the new value.
+                    $field.val(content);
+                    try {
+                        $field.trigger('change');
+                    } catch (err) {
+                        if (window.console && console.warn) {
+                            console.warn('AI media: downstream change handler threw', err);
+                        }
+                    }
+                    if ($field[0]) {
+                        $field[0].dispatchEvent(new Event('input', { bubbles: true }));
+                    }
                     
                     $button.after('<span class="description" style="color: #46b450; margin-right: 5px;">✓ ' + atAiMedia.strings.success + '</span>');
                     
