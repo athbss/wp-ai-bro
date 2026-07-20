@@ -72,6 +72,9 @@ class AT_Content_Optimizer {
 
         $post_id = intval($_POST['post_id'] ?? 0);
         $selected_taxonomies = $_POST['taxonomies'] ?? array();
+        if (!is_array($selected_taxonomies)) {
+            $selected_taxonomies = array();
+        }
 
         if (!$post_id) {
             wp_send_json_error(__('מזהה פוסט לא תקין', 'wordpress-ai-assistant'));
@@ -80,6 +83,10 @@ class AT_Content_Optimizer {
         $post = get_post($post_id);
         if (!$post) {
             wp_send_json_error(__('פוסט לא נמצא', 'wordpress-ai-assistant'));
+        }
+
+        if (!current_user_can('edit_post', $post_id)) {
+            wp_send_json_error(__('אין הרשאות מספיקות', 'wordpress-ai-assistant'));
         }
 
         // Extract content
@@ -91,6 +98,11 @@ class AT_Content_Optimizer {
         // Get existing terms for selected taxonomies
         $existing_terms = array();
         foreach ($selected_taxonomies as $taxonomy) {
+            $taxonomy = sanitize_key($taxonomy);
+            if (!taxonomy_exists($taxonomy)) {
+                continue;
+            }
+
             $terms = get_terms(array(
                 'taxonomy' => $taxonomy,
                 'hide_empty' => false,
@@ -137,26 +149,45 @@ class AT_Content_Optimizer {
 
         $post_id = intval($_POST['post_id'] ?? 0);
         $suggestions = $_POST['suggestions'] ?? array();
+        if (!is_array($suggestions)) {
+            $suggestions = array();
+        }
 
         if (!$post_id) {
             wp_send_json_error(__('מזהה פוסט לא תקין', 'wordpress-ai-assistant'));
         }
 
+        if (!current_user_can('edit_post', $post_id)) {
+            wp_send_json_error(__('אין הרשאות מספיקות', 'wordpress-ai-assistant'));
+        }
+
         $applied = array();
 
         foreach ($suggestions as $taxonomy => $term_ids) {
-            if (!taxonomy_exists($taxonomy)) {
+            $taxonomy = sanitize_key($taxonomy);
+            if (!taxonomy_exists($taxonomy) || !is_array($term_ids)) {
                 continue;
             }
 
-            // Convert term IDs to integers
-            $term_ids = array_map('intval', $term_ids);
+            // Convert to integers and keep only term IDs that really exist in
+            // this taxonomy — the payload comes from the browser.
+            $term_ids = array_filter(array_map('intval', $term_ids));
+            $valid_ids = array();
+            foreach ($term_ids as $term_id) {
+                if (term_exists($term_id, $taxonomy)) {
+                    $valid_ids[] = $term_id;
+                }
+            }
+
+            if (empty($valid_ids)) {
+                continue;
+            }
 
             // Apply terms (append mode)
-            $result = wp_set_object_terms($post_id, $term_ids, $taxonomy, true);
+            $result = wp_set_object_terms($post_id, $valid_ids, $taxonomy, true);
 
             if (!is_wp_error($result)) {
-                $applied[$taxonomy] = count($term_ids);
+                $applied[$taxonomy] = count($valid_ids);
             }
         }
 
@@ -310,7 +341,16 @@ class AT_Content_Optimizer {
                         // Extract term IDs from the string
                         preg_match_all('/\((\d+)\)/u', $terms_str, $id_matches);
                         if (!empty($id_matches[1])) {
-                            $suggestions[$taxonomy] = array_map('intval', $id_matches[1]);
+                            // Keep only IDs that actually belong to this taxonomy's
+                            // existing terms — never trust IDs the model returns.
+                            $valid_ids = array_map('intval', array_keys($terms));
+                            $picked = array_values(array_intersect(
+                                array_map('intval', $id_matches[1]),
+                                $valid_ids
+                            ));
+                            if (!empty($picked)) {
+                                $suggestions[$taxonomy] = $picked;
+                            }
                         }
                         break;
                     }

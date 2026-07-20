@@ -3,19 +3,19 @@
   "name": "WordPress AI Assistant",
   "slug": "wordpress-ai-assistant",
   "plugin_file": "wordpress-ai-assistant/wordpress-ai-assistant.php",
-  "version": "1.9.3",
+  "version": "1.9.4",
   "author": "Amit Trabelsi",
   "author_profile": "https://amit-trabelsi.co.il",
   "homepage": "https://github.com/athbss/wp-ai-bro",
   "requires": "5.8",
   "tested": "7.0.2",
   "requires_php": "7.4",
-  "last_updated": "2026-07-20 10:15:00",
+  "last_updated": "2026-07-20 14:45:00",
   "package": "https://updates.amiteam.io/wordpress-ai-assistant/download",
   "download_url": "https://updates.amiteam.io/wordpress-ai-assistant/download",
   "sections": {
     "description": "תוסף WordPress מתקדם המספק יכולות בינה מלאכותית לשיפור תהליכי יצירת תוכן, נגישות וחוויית המשתמש.",
-    "changelog": "<h4>1.9.3</h4><ul><li>תיקון: כפתור 'צור טקסט חלופי AI' בפרטי המדיה — הטקסט שנוצר לא הוזן לשדה; כעת מוזן לשדה הנכון ונשמר תקין.</li></ul><h4>1.9.2</h4><ul><li>רענון מבוקר של עדכוני CDN במסך התוספים וקיצור cache ה-manifest.</li></ul>"
+    "changelog": "<h4>1.9.4</h4><ul><li>עיצוב אחיד למסכי הניהול (Design Tokens, RTL, נגישות) ותיקוני תיוג אוטומטי — איסוף הטקסונומיות שנבחרו, סינון הצעות לאיברים קיימים והקשחת הרשאות.</li></ul><h4>1.9.3</h4><ul><li>תיקון: כפתור 'צור טקסט חלופי AI' בפרטי המדיה — הטקסט שנוצר לא הוזן לשדה; כעת מוזן לשדה הנכון ונשמר תקין.</li></ul><h4>1.9.2</h4><ul><li>רענון מבוקר של עדכוני CDN במסך התוספים וקיצור cache ה-manifest.</li></ul>"
   },
   "banners": {
     "low": "",

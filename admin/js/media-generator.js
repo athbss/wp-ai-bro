@@ -62,10 +62,19 @@
             'class': 'button button-secondary at-ai-generate-' + fieldType,
             'data-field-type': fieldType,
             'data-attachment-id': attachmentId,
-            'style': 'margin-top: 5px;'
+            'aria-label': label
         });
 
-        $btn.html('<span class="dashicons dashicons-admin-generic"></span> ' + label);
+        // Distinct, meaningful dashicon per field type (visual only).
+        var icons = {
+            'alt': 'universal-access-alt',
+            'title': 'editor-textcolor',
+            'caption': 'format-quote',
+            'description': 'text'
+        };
+        var icon = icons[fieldType] || 'admin-generic';
+
+        $btn.html('<span class="dashicons dashicons-' + icon + '" aria-hidden="true"></span> ' + label);
         $btn.on('click', handleAiGeneration);
 
         return $btn;

@@ -312,16 +312,17 @@ class AT_WordPress_AI_Assistant_Admin {
             </p>
 
             <!-- Smart Taxonomy Tagging -->
-            <h4><?php _e('תיוג אוטומטי חכם', 'wordpress-ai-assistant'); ?></h4>
-            
+            <h4><span class="dashicons dashicons-tag"></span> <?php _e('תיוג אוטומטי חכם', 'wordpress-ai-assistant'); ?></h4>
+
             <div class="at-ai-taxonomy-selection">
                 <p class="description">
                     <?php _e('בחר טקסונומיות לתיוג:', 'wordpress-ai-assistant'); ?>
                 </p>
                 <?php foreach ($public_taxonomies as $taxonomy): ?>
-                    <label style="display: block; margin: 5px 0;">
-                        <input type="checkbox" 
-                               class="at-ai-taxonomy-checkbox" 
+                    <label>
+                        <input type="checkbox"
+                               class="at-ai-taxonomy-checkbox"
+                               name="at_ai_taxonomies[]"
                                value="<?php echo esc_attr($taxonomy->name); ?>"
                                <?php checked(in_array($taxonomy->name, array('post_tag', 'category'))); ?>>
                         <?php echo esc_html($taxonomy->labels->name); ?>
@@ -354,7 +355,7 @@ class AT_WordPress_AI_Assistant_Admin {
             <hr>
 
             <!-- SEO/AEO Optimization -->
-            <h4><?php _e('אופטימיזציה SEO ו-AEO', 'wordpress-ai-assistant'); ?></h4>
+            <h4><span class="dashicons dashicons-search"></span> <?php _e('אופטימיזציה SEO ו-AEO', 'wordpress-ai-assistant'); ?></h4>
             <p class="description">
                 <?php _e('שפר את התוכן למנועי חיפוש ומנועי תשובות AI', 'wordpress-ai-assistant'); ?>
             </p>
@@ -732,12 +733,13 @@ class AT_WordPress_AI_Assistant_Admin {
 
         settings_errors('at_ai_assistant_messages');
         ?>
-        <div class="wrap at-agency-manager-wrap">
+        <div class="wrap at-agency-manager-wrap at-ai-admin">
             <h1><?php _e('הגדרות עוזר AI לוורדפרס', 'wordpress-ai-assistant'); ?></h1>
+            <p class="at-ai-page-intro"><?php _e('נהל את ספקי ה-AI, המפתחות והתכונות האוטומטיות של התוסף במקום אחד.', 'wordpress-ai-assistant'); ?></p>
 
             <?php $this->render_tabs(); ?>
 
-            <div class="card" style="margin-top: 20px;">
+            <div class="card"><!-- UX: styling now driven by admin.css tokens -->
                 <form action="options.php" method="post">
                     <?php
                     $active_tab = isset($_GET['tab']) ? $_GET['tab'] : 'general';
@@ -930,8 +932,9 @@ class AT_WordPress_AI_Assistant_Admin {
         ?>
         <div class="at-ai-credentials">
             <?php foreach ($providers as $provider): ?>
-                <div class="at-ai-provider-credentials" style="margin-bottom: 30px; padding: 20px; border: 1px solid #ddd; border-radius: 4px;">
+                <div class="at-ai-provider-credentials">
                     <h3>
+                        <span class="dashicons dashicons-admin-network"></span>
                         <?php printf(__('הגדרות %s API', 'wordpress-ai-assistant'), ucfirst($provider)); ?>
                     </h3>
 
@@ -951,14 +954,14 @@ class AT_WordPress_AI_Assistant_Admin {
                                         data-provider="<?php echo $provider; ?>">
                                     <?php _e('בדיקת חיבור', 'wordpress-ai-assistant'); ?>
                                 </button>
-                                <p class="description" style="margin: 8px 0; padding: 10px; background: #f0f6ff; border-right: 4px solid #0073aa; border-radius: 3px;">
-                                    <?php if (isset($api_key_pages[$provider])): ?>
-                                        <strong><?php echo $api_key_pages[$provider]['help_text']; ?></strong><br>
-                                        <a href="<?php echo esc_url($api_key_pages[$provider]['url']); ?>" target="_blank" rel="noopener noreferrer" style="color: #0073aa; text-decoration: none; font-weight: 600;">
-                                            🔗 <?php printf(__('פתח את קונסול %s', 'wordpress-ai-assistant'), ucfirst($provider)); ?>
-                                        </a>
-                                    <?php endif; ?>
+                                <?php if (isset($api_key_pages[$provider])): ?>
+                                <p class="description at-ai-key-help">
+                                    <strong><?php echo esc_html($api_key_pages[$provider]['help_text']); ?></strong><br>
+                                    <a href="<?php echo esc_url($api_key_pages[$provider]['url']); ?>" target="_blank" rel="noopener noreferrer">
+                                        🔗 <?php printf(__('פתח את קונסול %s', 'wordpress-ai-assistant'), ucfirst($provider)); ?>
+                                    </a>
                                 </p>
+                                <?php endif; ?>
                             </td>
                         </tr>
 
@@ -1008,27 +1011,28 @@ class AT_WordPress_AI_Assistant_Admin {
             );
         }
         ?>
-        <div class="wrap">
+        <div class="wrap at-ai-admin">
             <h1><?php _e('שימוש ועלויות AI', 'wordpress-ai-assistant'); ?></h1>
+            <p class="at-ai-page-intro"><?php _e('סקירת צריכת הבקשות, הטוקנים והעלות המשוערת בחודש הנוכחי.', 'wordpress-ai-assistant'); ?></p>
 
-            <div class="at-ai-stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
-                <div class="at-ai-stat-card" style="background: #fff; border: 1px solid #ddd; padding: 20px; border-radius: 4px;">
+            <div class="at-ai-stats-grid">
+                <div class="at-ai-stat-card">
                     <h3><?php _e('סך בקשות', 'wordpress-ai-assistant'); ?></h3>
-                    <div style="font-size: 32px; font-weight: bold; color: #0073aa;">
+                    <div class="at-ai-stat-value">
                         <?php echo number_format($usage_tracker['total_requests']); ?>
                     </div>
                 </div>
 
-                <div class="at-ai-stat-card" style="background: #fff; border: 1px solid #ddd; padding: 20px; border-radius: 4px;">
+                <div class="at-ai-stat-card">
                     <h3><?php _e('סך טוקנים', 'wordpress-ai-assistant'); ?></h3>
-                    <div style="font-size: 32px; font-weight: bold; color: #0073aa;">
+                    <div class="at-ai-stat-value">
                         <?php echo number_format($usage_tracker['total_tokens']); ?>
                     </div>
                 </div>
 
-                <div class="at-ai-stat-card" style="background: #fff; border: 1px solid #ddd; padding: 20px; border-radius: 4px;">
+                <div class="at-ai-stat-card is-cost">
                     <h3><?php _e('עלות כוללת', 'wordpress-ai-assistant'); ?></h3>
-                    <div style="font-size: 32px; font-weight: bold; color: #0073aa;">
+                    <div class="at-ai-stat-value">
                         $<?php echo number_format($cost_summary['total_cost'], 2); ?>
                     </div>
                 </div>
@@ -1068,12 +1072,13 @@ class AT_WordPress_AI_Assistant_Admin {
      */
     public function display_playground_page() {
         ?>
-        <div class="wrap">
+        <div class="wrap at-ai-admin">
             <h1><?php _e('מגרש משחקים AI', 'wordpress-ai-assistant'); ?></h1>
+            <p class="at-ai-page-intro"><?php _e('בדוק פרומפטים מול הספק הפעיל לפני שילובם בתכונות האתר.', 'wordpress-ai-assistant'); ?></p>
 
             <div class="at-ai-playground">
-                <div class="at-ai-playground-form">
-                    <h3><?php _e('בדיקת יצירת AI', 'wordpress-ai-assistant'); ?></h3>
+                <div class="at-ai-playground-form at-ai-panel">
+                    <h3 class="at-ai-section-title"><span class="dashicons dashicons-superhero"></span> <?php _e('בדיקת יצירת AI', 'wordpress-ai-assistant'); ?></h3>
                     <form id="at-ai-playground-form">
                         <table class="form-table">
                             <tr>
@@ -1104,7 +1109,7 @@ class AT_WordPress_AI_Assistant_Admin {
 
                 <div class="at-ai-playground-result" style="margin-top: 30px;">
                     <h3><?php _e('תוצאה', 'wordpress-ai-assistant'); ?></h3>
-                    <div id="at-ai-result" style="background: #f9f9f9; padding: 20px; border: 1px solid #ddd; border-radius: 4px; min-height: 100px;">
+                    <div id="at-ai-result">
                         <?php _e('תוצאות יופיעו כאן...', 'wordpress-ai-assistant'); ?>
                     </div>
                 </div>
@@ -1176,18 +1181,14 @@ class AT_WordPress_AI_Assistant_Admin {
             }
         }
         ?>
-        <div class="wrap">
+        <div class="wrap at-ai-admin">
             <h1><?php _e('מצב מערכת - WordPress AI Assistant', 'wordpress-ai-assistant'); ?></h1>
 
             <!-- סטטוס כללי -->
-            <div class="at-ai-system-status-header" style="background: <?php echo $has_critical ? '#f8d7da' : '#d4edda'; ?>; 
-                 padding: 20px; 
-                 border-right: 4px solid <?php echo $has_critical ? '#dc3545' : '#28a745'; ?>; 
-                 border-radius: 4px; 
-                 margin: 20px 0;">
-                <h2 style="margin: 0 0 10px 0; color: <?php echo $has_critical ? '#721c24' : '#155724'; ?>;">
+            <div class="at-ai-system-status-header <?php echo $has_critical ? 'is-critical' : 'is-ok'; ?>">
+                <h2>
                     <?php echo $has_critical ? '⚠️' : '✅'; ?>
-                    <?php 
+                    <?php
                     if ($has_critical) {
                         _e('נמצאו בעיות קריטיות', 'wordpress-ai-assistant');
                     } else {
@@ -1195,7 +1196,7 @@ class AT_WordPress_AI_Assistant_Admin {
                     }
                     ?>
                 </h2>
-                <p style="margin: 0; color: <?php echo $has_critical ? '#721c24' : '#155724'; ?>;">
+                <p>
                     <?php
                     if ($has_critical) {
                         _e('יש לטפל בתלויות הנדרשות כדי שהתוסף יוכל לפעול כראוי.', 'wordpress-ai-assistant');
@@ -1207,7 +1208,7 @@ class AT_WordPress_AI_Assistant_Admin {
             </div>
 
             <!-- סביבת השרת -->
-            <div class="at-ai-server-info" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 20px;">
+            <div class="at-ai-server-info">
                 <h2><?php _e('פרטי סביבת השרת', 'wordpress-ai-assistant'); ?></h2>
                 <table class="widefat" style="margin-top: 15px;">
                     <tbody>
@@ -1356,8 +1357,8 @@ class AT_WordPress_AI_Assistant_Admin {
             <?php endif; ?>
 
             <!-- הנחיות כלליות -->
-            <div class="at-ai-guidelines" style="background: #e7f3ff; padding: 20px; border-right: 3px solid #0073aa; border-radius: 4px;">
-                <h3 style="margin-top: 0;"><?php _e('💡 טיפים להתקנה', 'wordpress-ai-assistant'); ?></h3>
+            <div class="at-ai-guidelines">
+                <h3><?php _e('💡 טיפים להתקנה', 'wordpress-ai-assistant'); ?></h3>
                 <ul style="margin-bottom: 0;">
                     <li><?php _e('רוב הרכיבים הנדרשים (PHP Extensions) צריכים להיות מותקנים על ידי מנהל השרת.', 'wordpress-ai-assistant'); ?></li>
                     <li><?php _e('ספריות חיצוניות כמו Feature API ניתן להתקין דרך Composer או באופן ידני.', 'wordpress-ai-assistant'); ?></li>
@@ -1389,7 +1390,7 @@ class AT_WordPress_AI_Assistant_Admin {
             </thead>
             <tbody>
                 <?php foreach ($dependencies as $key => $dep): ?>
-                <tr style="<?php echo !$dep['available'] ? 'background-color: #fff3cd;' : ''; ?>">
+                <tr class="<?php echo !$dep['available'] ? 'at-ai-row-missing' : ''; ?>">
                     <td style="text-align: center; font-size: 20px;">
                         <?php echo $dep['available'] ? '✅' : '❌'; ?>
                     </td>
@@ -1397,36 +1398,36 @@ class AT_WordPress_AI_Assistant_Admin {
                         <strong><?php echo esc_html($dep['name']); ?></strong>
                     </td>
                     <td>
-                        <span class="at-ai-badge" style="display: inline-block; padding: 3px 8px; background: #f0f0f0; border-radius: 3px; font-size: 11px;">
+                        <span class="at-ai-badge">
                             <?php echo esc_html(ucfirst($dep['type'])); ?>
                         </span>
                     </td>
                     <td>
                         <?php if ($dep['available']): ?>
-                            <span style="color: #28a745; font-weight: bold;">
+                            <span class="at-ai-status-pill is-ok">
                                 <?php _e('מותקן', 'wordpress-ai-assistant'); ?>
                             </span>
                         <?php else: ?>
-                            <span style="color: #dc3545; font-weight: bold;">
+                            <span class="at-ai-status-pill is-missing">
                                 <?php _e('חסר', 'wordpress-ai-assistant'); ?>
                             </span>
                         <?php endif; ?>
                     </td>
                     <td>
-                        <span style="font-size: 13px; color: #666;">
+                        <span class="description">
                             <?php echo esc_html($dep['description']); ?>
                         </span>
                     </td>
                     <td>
                         <?php if (!$dep['available'] && !empty($dep['docs_url'])): ?>
-                            <a href="<?php echo esc_url($dep['docs_url']); ?>" 
-                               class="button button-small button-primary" 
-                               target="_blank" 
+                            <a href="<?php echo esc_url($dep['docs_url']); ?>"
+                               class="button button-small button-primary"
+                               target="_blank"
                                rel="noopener noreferrer">
                                 <?php _e('הוראות התקנה', 'wordpress-ai-assistant'); ?>
                             </a>
                         <?php elseif ($dep['available']): ?>
-                            <span style="color: #28a745;">✓ פעיל</span>
+                            <span class="at-ai-status-pill is-ok">✓ <?php _e('פעיל', 'wordpress-ai-assistant'); ?></span>
                         <?php endif; ?>
                     </td>
                 </tr>
