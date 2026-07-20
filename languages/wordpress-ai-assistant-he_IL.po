@@ -486,3 +486,41 @@ msgstr "מצב מערכת"
 
 msgid "מצב מערכת - WordPress AI Assistant"
 msgstr "מצב מערכת - WordPress AI Assistant"
+
+# --- Media AI button labels (added 1.9.5) ---
+
+msgid "צור טקסט חלופי AI"
+msgstr "צור טקסט חלופי AI"
+
+msgid "צור כותרת AI"
+msgstr "צור כותרת AI"
+
+msgid "צור כיתוב AI"
+msgstr "צור כיתוב AI"
+
+msgid "צור תיאור AI"
+msgstr "צור תיאור AI"
+
+msgid "צור AI"
+msgstr "צור AI"
+
+msgid "נגישות AI"
+msgstr "נגישות AI"
+
+msgid "מייצר..."
+msgstr "מייצר..."
+
+msgid "שגיאה"
+msgstr "שגיאה"
+
+msgid "נוצר בהצלחה!"
+msgstr "נוצר בהצלחה!"
+
+msgid "שגיאת רשת"
+msgstr "שגיאת רשת"
+
+msgid "שדה לא נמצא"
+msgstr "שדה לא נמצא"
+
+msgid "שגיאה לא ידועה"
+msgstr "שגיאה לא ידועה"

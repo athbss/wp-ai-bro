@@ -38,7 +38,10 @@ class AT_Image_Alt_Generator {
         // Hook into WordPress.
         add_filter('wp_generate_attachment_metadata', array($this, 'generate_alt_text_for_images'), 10, 2);
         add_action('at_ai_generate_alt_text_delayed', array($this, 'generate_alt_text'), 10, 1);
-        add_filter('attachment_fields_to_edit', array($this, 'add_attachment_action'), 10, 2);
+        // Note (1.9.5): the attachment_fields_to_edit "one-click alt" button was
+        // removed to avoid a duplicate alt button in the media modal. AI buttons
+        // are now injected by admin/js/media-generator.js as the single source.
+        // AJAX handlers below remain (used by AI Abilities / programmatic calls).
 
         // AJAX handlers
         add_action('wp_ajax_at_ai_generate_alt_text', array($this, 'ajax_generate_alt_text'));
@@ -154,31 +157,6 @@ class AT_Image_Alt_Generator {
         }
 
         return 'data:' . $mime_type . ';base64,' . base64_encode($contents);
-    }
-
-    /**
-     * Add a one-click action in attachment details, including the media modal.
-     *
-     * @param array   $fields Attachment fields.
-     * @param WP_Post $post   Attachment post.
-     * @return array
-     */
-    public function add_attachment_action($fields, $post) {
-        if (!$this->is_supported_image($post->ID) || !current_user_can('edit_post', $post->ID)) {
-            return $fields;
-        }
-
-        $fields['at_ai_generate_alt_text'] = array(
-            'label' => __('AI accessibility', 'wordpress-ai-assistant'),
-            'input' => 'html',
-            'html'  => sprintf(
-                '<button type="button" class="button at-ai-generate-alt-text" data-attachment-id="%d">%s</button>',
-                (int) $post->ID,
-                esc_html__('Generate alt text with AI', 'wordpress-ai-assistant')
-            ),
-        );
-
-        return $fields;
     }
 
     /**

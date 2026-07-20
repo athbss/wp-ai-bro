@@ -1,0 +1,53 @@
+# Copyright (C) 2025 Amit Trabelsi
+# This file is distributed under the GPL v2 or later.
+# Arabic translations for media AI button labels (source strings are Hebrew).
+msgid ""
+msgstr ""
+"Project-Id-Version: WordPress AI Assistant\n"
+"Report-Msgid-Bugs-To: https://github.com/athbss/wp-ai-bro/issues\n"
+"POT-Creation-Date: 2025-12-08 12:00+0000\n"
+"PO-Revision-Date: 2026-07-20 00:00+0000\n"
+"Last-Translator: Amit Trabelsi <amit@amit-trabelsi.co.il>\n"
+"Language-Team: Arabic\n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);\n"
+"X-Domain: wordpress-ai-assistant\n"
+
+msgid "צור טקסט חלופי AI"
+msgstr "إنشاء نص بديل بالذكاء الاصطناعي"
+
+msgid "צור כותרת AI"
+msgstr "إنشاء عنوان بالذكاء الاصطناعي"
+
+msgid "צור כיתוב AI"
+msgstr "إنشاء تعليق بالذكاء الاصطناعي"
+
+msgid "צור תיאור AI"
+msgstr "إنشاء وصف بالذكاء الاصطناعي"
+
+msgid "צור AI"
+msgstr "إنشاء بالذكاء الاصطناعي"
+
+msgid "נגישות AI"
+msgstr "إتاحة الوصول بالذكاء الاصطناعي"
+
+msgid "מייצר..."
+msgstr "جارٍ الإنشاء..."
+
+msgid "שגיאה"
+msgstr "خطأ"
+
+msgid "נוצר בהצלחה!"
+msgstr "تم الإنشاء بنجاح!"
+
+msgid "שגיאת רשת"
+msgstr "خطأ في الشبكة"
+
+msgid "שדה לא נמצא"
+msgstr "الحقل غير موجود"
+
+msgid "שגיאה לא ידועה"
+msgstr "خطأ غير معروف"

@@ -464,3 +464,41 @@ msgstr ""
 msgid "IMPORTANT: Respond in %s (%s). All generated content must be in this language."
 msgstr ""
 
+
+# --- Media AI button labels (added 1.9.5) ---
+
+msgid "צור טקסט חלופי AI"
+msgstr ""
+
+msgid "צור כותרת AI"
+msgstr ""
+
+msgid "צור כיתוב AI"
+msgstr ""
+
+msgid "צור תיאור AI"
+msgstr ""
+
+msgid "צור AI"
+msgstr ""
+
+msgid "נגישות AI"
+msgstr ""
+
+msgid "מייצר..."
+msgstr ""
+
+msgid "שגיאה"
+msgstr ""
+
+msgid "נוצר בהצלחה!"
+msgstr ""
+
+msgid "שגיאת רשת"
+msgstr ""
+
+msgid "שדה לא נמצא"
+msgstr ""
+
+msgid "שגיאה לא ידועה"
+msgstr ""

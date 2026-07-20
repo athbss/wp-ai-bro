@@ -9,48 +9,87 @@
     'use strict';
 
     /**
-     * Add AI buttons to attachment fields after page load
+     * Single source of truth for which field gets which AI button, on every
+     * media edit surface. `selectors` are safe everywhere (their ids/setting
+     * attributes only exist in an attachment context). `classicSelectors` run
+     * ONLY on the classic "Edit Media" screen (body.post-type-attachment), so
+     * the generic #title id can never be matched on a normal post editor.
+     */
+    var FIELD_CONFIG = [
+        {
+            type: 'alt', labelKey: 'label_alt', fallback: 'צור טקסט חלופי AI',
+            selectors: ['#attachment-details-two-column-alt-text', '#attachment-details-alt-text'],
+            classicSelectors: ['#attachment_alt']
+        },
+        {
+            type: 'title', labelKey: 'label_title', fallback: 'צור כותרת AI',
+            selectors: ['#attachment-details-two-column-title', '#attachment-details-title'],
+            classicSelectors: ['#title']
+        },
+        {
+            type: 'caption', labelKey: 'label_caption', fallback: 'צור כיתוב AI',
+            selectors: ['#attachment-details-two-column-caption', '#attachment-details-caption'],
+            classicSelectors: ['#attachment_caption']
+        },
+        {
+            type: 'description', labelKey: 'label_description', fallback: 'צור תיאור AI',
+            selectors: ['#attachment-details-two-column-description', '#attachment-details-description'],
+            classicSelectors: ['#attachment_content']
+        }
+    ];
+
+    /**
+     * True on the classic "Edit Media" screen, where attachment-specific field
+     * ids (and the generic #title) are safe to target.
+     */
+    function isClassicAttachmentScreen() {
+        return document.body && document.body.classList.contains('post-type-attachment');
+    }
+
+    /**
+     * Add exactly one AI button per field, across all media edit surfaces.
      */
     function addAiButtonsToFields() {
         var attachmentId = getAttachmentId();
         if (!attachmentId) {
-            console.log('No attachment ID found');
             return;
         }
 
-        console.log('Adding AI buttons for attachment:', attachmentId);
+        FIELD_CONFIG.forEach(function(cfg) {
+            var selectorList = cfg.selectors.slice();
+            if (isClassicAttachmentScreen() && cfg.classicSelectors) {
+                selectorList = selectorList.concat(cfg.classicSelectors);
+            }
 
-        // Alt text field
-        var $altInput = $('#attachment-details-two-column-alt-text');
-        if ($altInput.length && !$altInput.next('.at-ai-generate-alt').length) {
-            var $altBtn = createAiButton('alt', attachmentId, 'צור טקסט חלופי AI');
-            $altInput.after($altBtn);
-            console.log('Alt button added');
-        }
+            // First existing field wins; only one button per type per screen.
+            var $field = null;
+            for (var i = 0; i < selectorList.length; i++) {
+                var $candidate = $(selectorList[i]).first();
+                if ($candidate.length) { $field = $candidate; break; }
+            }
+            if (!$field) {
+                return;
+            }
 
-        // Title field
-        var $titleInput = $('#attachment-details-two-column-title');
-        if ($titleInput.length && !$titleInput.next('.at-ai-generate-title').length) {
-            var $titleBtn = createAiButton('title', attachmentId, 'צור כותרת AI');
-            $titleInput.after($titleBtn);
-            console.log('Title button added');
-        }
+            // Guard against duplicates (setInterval re-runs, modal re-render).
+            if ($field.nextAll('.at-ai-generate-' + cfg.type).length) {
+                return;
+            }
 
-        // Caption field  
-        var $captionInput = $('#attachment-details-two-column-caption');
-        if ($captionInput.length && !$captionInput.next('.at-ai-generate-caption').length) {
-            var $captionBtn = createAiButton('caption', attachmentId, 'צור כיתוב AI');
-            $captionInput.after($captionBtn);
-            console.log('Caption button added');
-        }
+            var $btn = createAiButton(cfg.type, attachmentId, aiMediaLabel(cfg.labelKey, cfg.fallback));
+            $field.after($btn);
+        });
+    }
 
-        // Description field
-        var $descInput = $('#attachment-details-two-column-description');
-        if ($descInput.length && !$descInput.next('.at-ai-generate-description').length) {
-            var $descBtn = createAiButton('description', attachmentId, 'צור תיאור AI');
-            $descInput.after($descBtn);
-            console.log('Description button added');
+    /**
+     * Resolve a localized button label from atAiMedia.strings, with a safe
+     * fallback so buttons still render if localization is unavailable.
+     */
+    function aiMediaLabel(key, fallback) {
+        if (typeof atAiMedia !== 'undefined' && atAiMedia.strings && atAiMedia.strings[key]) {
+            return atAiMedia.strings[key];
         }
+        return fallback;
     }
 
     /**
@@ -118,15 +157,17 @@
             $field = findFieldByType(fieldType);
         }
         if (!$field || !$field.length) {
-            alert('שדה לא נמצא');
+            alert(aiMediaLabel('field_not_found', 'שדה לא נמצא'));
             return;
         }
 
-        // Disable button and show spinner
+        // Disable button and show spinner (loading state)
         var originalHtml = $button.html();
-        $button.prop('disabled', true).html(
-            '<span class="dashicons dashicons-update spin"></span> ' + atAiMedia.strings.generating
-        );
+        var succeeded = false;
+        $button.prop('disabled', true)
+            .addClass('is-loading')
+            .attr('aria-busy', 'true')
+            .html('<span class="dashicons dashicons-update spin" aria-hidden="true"></span> ' + atAiMedia.strings.generating);
 
         // Determine AJAX action
         var action = 'at_ai_generate_' + fieldType;
@@ -164,27 +205,38 @@
                     if ($field[0]) {
                         $field[0].dispatchEvent(new Event('input', { bubbles: true }));
                     }
-                    
-                    $button.after('<span class="description" style="color: #46b450; margin-right: 5px;">✓ ' + atAiMedia.strings.success + '</span>');
-                    
+
+                    // Polished success state on the button itself: swap to a
+                    // check icon + success label, then restore after a beat.
+                    succeeded = true;
+                    $button.removeClass('is-loading').addClass('is-success')
+                        .prop('disabled', false)
+                        .removeAttr('aria-busy')
+                        .html('<span class="dashicons dashicons-yes" aria-hidden="true"></span> ' + atAiMedia.strings.success);
+
                     setTimeout(function() {
-                        $button.siblings('.description').fadeOut(function() {
-                            $(this).remove();
-                        });
-                    }, 3000);
+                        $button.removeClass('is-success').html(originalHtml);
+                    }, 2500);
 
                     if (response.data.usage) {
                         console.log('AI Usage:', response.data.usage);
                     }
                 } else {
-                    alert(atAiMedia.strings.error + ': ' + (response.data || 'שגיאה לא ידועה'));
+                    alert(atAiMedia.strings.error + ': ' + (response.data || aiMediaLabel('unknown_error', 'שגיאה לא ידועה')));
                 }
             },
             error: function() {
                 alert(atAiMedia.strings.network_error);
             },
             complete: function() {
-                $button.prop('disabled', false).html(originalHtml);
+                // On success the button keeps its success state (restored by the
+                // timeout above); only reset here for the error/failure paths.
+                if (!succeeded) {
+                    $button.prop('disabled', false)
+                        .removeClass('is-loading')
+                        .removeAttr('aria-busy')
+                        .html(originalHtml);
+                }
             }
         });
     }
@@ -194,15 +246,13 @@
      */
     function findFieldByType(fieldType) {
         var selectors = {
-            'title': '#attachment-details-two-column-title, [data-setting="title"]',
-            'alt': '#attachment-details-two-column-alt-text, [data-setting="alt"]',
-            'caption': '#attachment-details-two-column-caption, [data-setting="caption"]',
-            'description': '#attachment-details-two-column-description, [data-setting="description"]'
+            'title': '#attachment-details-two-column-title, #attachment-details-title, #title, [data-setting="title"]',
+            'alt': '#attachment-details-two-column-alt-text, #attachment-details-alt-text, #attachment_alt, [data-setting="alt"]',
+            'caption': '#attachment-details-two-column-caption, #attachment-details-caption, #attachment_caption, [data-setting="caption"]',
+            'description': '#attachment-details-two-column-description, #attachment-details-description, #attachment_content, [data-setting="description"]'
         };
 
-        var $field = $(selectors[fieldType] || '');
-        console.log('Finding field for', fieldType, ':', $field.length, 'found');
-        return $field.first();
+        return $(selectors[fieldType] || '').first();
     }
 
     /**
@@ -223,24 +273,16 @@
      * Initialize on document ready
      */
     $(document).ready(function() {
-        console.log('Media AI Generator loading...');
-        
-        // Add buttons after page loads
-        setTimeout(function() {
-            addAiButtonsToFields();
-            console.log('AI buttons added');
-        }, 1000);
+        // Initial pass once the media UI has rendered.
+        setTimeout(addAiButtonsToFields, 1000);
 
-        // Re-add buttons every 2 seconds (in case DOM changes)
-        setInterval(function() {
-            addAiButtonsToFields();
-        }, 2000);
+        // Re-run on DOM changes (modal open/close, Backbone re-render).
+        // Buttons are de-duplicated per field inside addAiButtonsToFields().
+        setInterval(addAiButtonsToFields, 2000);
     });
 
-    // Add simple spin animation for dashicons
-    var style = document.createElement('style');
-    style.textContent = '.dashicons.spin { animation: rotation 1s infinite linear; } @keyframes rotation { from { transform: rotate(0deg); } to { transform: rotate(359deg); } }';
-    document.head.appendChild(style);
+    // Spinner/loading/success/hover styling lives in admin/css/admin.css
+    // (enqueued on the same admin pages), so no runtime <style> injection here.
 
 })(jQuery);
 

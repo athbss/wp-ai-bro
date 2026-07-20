@@ -1,0 +1,53 @@
+# Copyright (C) 2025 Amit Trabelsi
+# This file is distributed under the GPL v2 or later.
+# English translations for media AI button labels (source strings are Hebrew).
+msgid ""
+msgstr ""
+"Project-Id-Version: WordPress AI Assistant\n"
+"Report-Msgid-Bugs-To: https://github.com/athbss/wp-ai-bro/issues\n"
+"POT-Creation-Date: 2025-12-08 12:00+0000\n"
+"PO-Revision-Date: 2026-07-20 00:00+0000\n"
+"Last-Translator: Amit Trabelsi <amit@amit-trabelsi.co.il>\n"
+"Language-Team: English\n"
+"Language: en_US\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Domain: wordpress-ai-assistant\n"
+
+msgid "צור טקסט חלופי AI"
+msgstr "Generate alt text with AI"
+
+msgid "צור כותרת AI"
+msgstr "Generate title with AI"
+
+msgid "צור כיתוב AI"
+msgstr "Generate caption with AI"
+
+msgid "צור תיאור AI"
+msgstr "Generate description with AI"
+
+msgid "צור AI"
+msgstr "Generate with AI"
+
+msgid "נגישות AI"
+msgstr "AI accessibility"
+
+msgid "מייצר..."
+msgstr "Generating..."
+
+msgid "שגיאה"
+msgstr "Error"
+
+msgid "נוצר בהצלחה!"
+msgstr "Generated successfully!"
+
+msgid "שגיאת רשת"
+msgstr "Network error"
+
+msgid "שדה לא נמצא"
+msgstr "Field not found"
+
+msgid "שגיאה לא ידועה"
+msgstr "Unknown error"

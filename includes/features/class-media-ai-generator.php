@@ -33,9 +33,11 @@ class AT_Media_AI_Generator {
     public function __construct() {
         $this->ai_manager = AT_AI_Manager::get_instance();
 
-        // Add AI buttons to attachment fields
-        add_filter('attachment_fields_to_edit', array($this, 'add_ai_buttons_to_attachment_fields'), 10, 2);
-        
+        // Note (1.9.5): AI buttons are injected by admin/js/media-generator.js
+        // (single source of truth across all media edit screens). The former
+        // server-side render_ai_button()/attachment_fields_to_edit path had no
+        // JS click handler (dead UI) and duplicated buttons — removed.
+
         // Enqueue scripts for media modal
         add_action('wp_enqueue_media', array($this, 'enqueue_media_scripts'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
@@ -45,72 +47,6 @@ class AT_Media_AI_Generator {
         add_action('wp_ajax_at_ai_generate_alt_text_media', array($this, 'ajax_generate_alt_text'));
         add_action('wp_ajax_at_ai_generate_caption', array($this, 'ajax_generate_caption'));
         add_action('wp_ajax_at_ai_generate_title', array($this, 'ajax_generate_title'));
-    }
-
-    /**
-     * Add AI generation buttons to attachment edit fields
-     *
-     * @param array $form_fields
-     * @param WP_Post $post
-     * @return array
-     */
-    public function add_ai_buttons_to_attachment_fields($form_fields, $post) {
-        // Only for images
-        if (!wp_attachment_is_image($post->ID)) {
-            return $form_fields;
-        }
-
-        // Add AI button for Title
-        if (isset($form_fields['post_title'])) {
-            $form_fields['post_title']['helps'] = $this->render_ai_button('title', $post->ID);
-        }
-
-        // Add AI button for Caption
-        if (isset($form_fields['post_excerpt'])) {
-            $form_fields['post_excerpt']['helps'] = $this->render_ai_button('caption', $post->ID);
-        }
-
-        // Add AI button for Alt Text
-        if (isset($form_fields['image_alt'])) {
-            $form_fields['image_alt']['helps'] = $this->render_ai_button('alt', $post->ID);
-        }
-
-        // Add AI button for Description
-        if (isset($form_fields['post_content'])) {
-            $form_fields['post_content']['helps'] = $this->render_ai_button('description', $post->ID);
-        }
-
-        return $form_fields;
-    }
-
-    /**
-     * Render AI generation button
-     *
-     * @param string $field_type
-     * @param int $attachment_id
-     * @return string
-     */
-    private function render_ai_button($field_type, $attachment_id) {
-        $labels = array(
-            'title' => __('צור כותרת AI', 'wordpress-ai-assistant'),
-            'caption' => __('צור כיתוב AI', 'wordpress-ai-assistant'),
-            'alt' => __('צור טקסט חלופי AI', 'wordpress-ai-assistant'),
-            'description' => __('צור תיאור AI', 'wordpress-ai-assistant'),
-        );
-
-        $label = isset($labels[$field_type]) ? $labels[$field_type] : __('צור AI', 'wordpress-ai-assistant');
-        
-        ob_start();
-        ?>
-        <button type="button" 
-                class="button button-secondary at-ai-generate-btn" 
-                data-field-type="<?php echo esc_attr($field_type); ?>"
-                data-attachment-id="<?php echo esc_attr($attachment_id); ?>">
-            <span class="dashicons dashicons-admin-generic"></span>
-            <?php echo esc_html($label); ?>
-        </button>
-        <?php
-        return ob_get_clean();
     }
 
     /**
@@ -157,6 +93,15 @@ class AT_Media_AI_Generator {
                 'error' => __('שגיאה', 'wordpress-ai-assistant'),
                 'success' => __('נוצר בהצלחה!', 'wordpress-ai-assistant'),
                 'network_error' => __('שגיאת רשת', 'wordpress-ai-assistant'),
+                'field_not_found' => __('שדה לא נמצא', 'wordpress-ai-assistant'),
+                'unknown_error' => __('שגיאה לא ידועה', 'wordpress-ai-assistant'),
+                // Button labels (i18n): were hard-coded in media-generator.js.
+                // media-generator.js is now the single source for AI buttons,
+                // and reads these translatable labels from atAiMedia.strings.
+                'label_alt' => __('צור טקסט חלופי AI', 'wordpress-ai-assistant'),
+                'label_title' => __('צור כותרת AI', 'wordpress-ai-assistant'),
+                'label_caption' => __('צור כיתוב AI', 'wordpress-ai-assistant'),
+                'label_description' => __('צור תיאור AI', 'wordpress-ai-assistant'),
             ),
         ));
     }

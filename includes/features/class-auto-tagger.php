@@ -45,7 +45,11 @@ class AT_Auto_Tagger {
 
         // Admin hooks
         add_action('admin_enqueue_scripts', array($this, 'enqueue_scripts'));
-        add_action('add_meta_boxes', array($this, 'add_tagging_meta_box'));
+        // Note (1.9.5): the "AI Tagging" meta box was removed — it duplicated the
+        // tag-suggestion UI (and the "Enable AI processing" checkbox) already in
+        // the main "עוזר AI" meta box (admin/class-admin.php, backed by the
+        // Content Optimizer). Auto-tagging on save + the AJAX/Ability endpoints
+        // below remain the single programmatic tagging path.
 
         // Add settings
         add_action('admin_init', array($this, 'register_settings'));
@@ -525,106 +529,6 @@ class AT_Auto_Tagger {
                 'applied' => __('Tags applied successfully', 'wordpress-ai-assistant'),
             ),
         ));
-    }
-
-    /**
-     * Add tagging meta box to posts
-     */
-    public function add_tagging_meta_box() {
-        $post_types = at_ai_assistant_get_supported_post_types();
-
-        foreach ($post_types as $post_type) {
-            add_meta_box(
-                'at_ai_tagging_meta',
-                __('AI Tagging', 'wordpress-ai-assistant'),
-                array($this, 'render_tagging_meta_box'),
-                $post_type,
-                'side',
-                'default'
-            );
-        }
-    }
-
-    /**
-     * Render tagging meta box
-     *
-     * @param WP_Post $post
-     */
-    public function render_tagging_meta_box($post) {
-        $ai_enabled = get_post_meta($post->ID, '_at_ai_processing_enabled', true);
-        if ($ai_enabled === '') {
-            $ai_enabled = '1'; // Default to enabled
-        }
-
-        $generated_tags = get_post_meta($post->ID, '_at_ai_generated_tags', true) ?: array();
-
-        wp_add_inline_script(
-            'at-ai-auto-tagger',
-            'at_ai_tagger.post_id = ' . (int) $post->ID . '; at_ai_tagger.post_type = ' . wp_json_encode($post->post_type) . '; at_ai_tagger.initial_tags = ' . wp_json_encode($generated_tags) . ';',
-            'before'
-        );
-
-        wp_nonce_field('at_ai_tagging_meta', 'at_ai_tagging_nonce');
-        ?>
-        <div class="at-ai-tagging-meta">
-            <p>
-                <label>
-                    <input type="checkbox" name="at_ai_processing_enabled" value="1" <?php checked($ai_enabled, '1'); ?>>
-                    <?php _e('Enable AI processing for this post', 'wordpress-ai-assistant');
-                    ?>
-                </label>
-            </p>
-
-            <div class="at-ai-generated-tags" style="margin-top: 10px;">
-                <?php if (!empty($generated_tags)): ?>
-                    <strong><?php _e('AI Generated Tags:', 'wordpress-ai-assistant'); ?></strong>
-                    <div style="margin: 5px 0;">
-                        <?php if (!empty($generated_tags['taxonomies']) && is_array($generated_tags['taxonomies'])): ?>
-                            <?php foreach ($generated_tags['taxonomies'] as $taxonomy_name => $terms): ?>
-                                <?php $taxonomy = get_taxonomy($taxonomy_name); ?>
-                                <div><strong><?php echo esc_html($taxonomy ? $taxonomy->labels->singular_name : $taxonomy_name); ?>:</strong>
-                                    <?php echo esc_html(implode(', ', (array) $terms)); ?>
-                                </div>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-
-                        <?php if (!empty($generated_tags['tags'])): ?>
-                            <div><strong><?php _e('Tags:', 'wordpress-ai-assistant'); ?></strong>
-                                <?php echo esc_html(implode(', ', $generated_tags['tags'])); ?>
-                            </div>
-                        <?php endif; ?>
-
-                        <?php if (!empty($generated_tags['categories'])): ?>
-                            <div><strong><?php _e('Categories:', 'wordpress-ai-assistant'); ?></strong>
-                                <?php echo esc_html(implode(', ', $generated_tags['categories'])); ?>
-                            </div>
-                        <?php endif; ?>
-
-                        <?php if (!empty($generated_tags['audience'])): ?>
-                            <div><strong><?php _e('Target Audience:', 'wordpress-ai-assistant'); ?></strong>
-                                <?php echo esc_html(implode(', ', $generated_tags['audience'])); ?>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                <?php endif; ?>
-            </div>
-
-            <div style="margin-top: 10px;">
-                <button type="button" class="button button-small" id="at_ai_generate_tags_btn">
-                    <?php _e('Generate Tags', 'wordpress-ai-assistant'); ?>
-                </button>
-                <button type="button" class="button button-small" id="at_ai_apply_tags_btn" style="margin-left: 5px;">
-                    <?php _e('Apply Tags', 'wordpress-ai-assistant'); ?>
-                </button>
-            </div>
-
-            <div id="at_ai_tags_preview" style="margin-top: 10px; display: none;">
-                <strong><?php _e('Preview:', 'wordpress-ai-assistant'); ?></strong>
-                <div id="at_ai_tags_content"></div>
-            </div>
-        </div>
-
-        <?php
     }
 
     /**

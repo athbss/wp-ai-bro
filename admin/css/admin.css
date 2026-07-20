@@ -398,13 +398,62 @@
     vertical-align: text-bottom;
 }
 
-/* Full-width action buttons inside the narrow side meta box */
+/* Action buttons inside the narrow side meta boxes (post editor).
+   Shared class .at-ai-action-btn keeps tagging / optimize / apply consistent. */
+.at-ai-meta-box .at-ai-action-btn,
 .at-ai-meta-box .at-ai-suggest-taxonomies,
 .at-ai-meta-box .at-ai-optimize-content,
 .at-ai-meta-box .at-ai-apply-suggestions {
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    font-weight: 500;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.at-ai-meta-box .at-ai-action-btn .dashicons {
+    color: var(--atai-accent);
+}
+
+.at-ai-meta-box .at-ai-action-btn.button-primary .dashicons {
+    color: inherit;
+}
+
+/* Button + its explanation grouped tightly (Gestalt: help belongs to button) */
+.at-ai-meta-box .at-ai-action {
+    margin-block: var(--atai-space-md) var(--atai-space-xs);
+}
+
+.at-ai-field-help {
+    display: block;
+    margin-block-start: var(--atai-space-xs);
+    color: var(--atai-text-muted);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+/* Loading state (JS adds .is-loading + .at-ai-spinner) */
+.at-ai-meta-box .at-ai-action-btn.is-loading {
+    color: var(--atai-text-muted);
+    cursor: progress;
+}
+
+/* Success state (JS adds .is-success for ~2s) */
+.at-ai-meta-box .at-ai-action-btn.is-success {
+    border-color: var(--atai-success);
+    color: #0a5c33;
+    background: #edf7f0;
+}
+
+.at-ai-meta-box .at-ai-action-btn.is-success .dashicons {
+    color: var(--atai-success);
+}
+
+/* Accessible focus ring for meta-box action buttons */
+.at-ai-meta-box .at-ai-action-btn:focus-visible {
+    outline: 2px solid var(--atai-primary);
+    outline-offset: 1px;
+    box-shadow: none;
 }
 
 #at-ai-operation-stats {
@@ -412,25 +461,103 @@
 }
 
 /* -------------------------------------------------------------------------
+ * Translation meta box (post editor) — visual consistency only; the create
+ * -translation flow (AJAX/post creation) is owned elsewhere and untouched.
+ * ---------------------------------------------------------------------- */
+.at-ai-translation-meta {
+    --atai-text-muted: var(--at-text-muted, #646970);
+}
+
+.at-ai-translation-meta .at-ai-field-help {
+    display: block;
+    margin-block-start: var(--atai-space-xs, 0.25rem);
+    color: var(--at-text-muted, #646970);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.at-ai-translation-meta .at-ai-translation-list ul {
+    margin-block: 5px;
+}
+
+/* -------------------------------------------------------------------------
  * Media Library AI buttons (alt/title/caption/description)
  * The JS injects <button class="button button-secondary at-ai-generate-*">.
  * Give them a clean, consistent, accessible look without touching handlers.
  * ---------------------------------------------------------------------- */
+/* These buttons render in the media modal, OUTSIDE the token-scoped wrappers,
+   so we read --at-* (defined on :root by suite-tokens.css) with literal
+   fallbacks rather than the wrapper-scoped --atai-* vars. */
 [class*="at-ai-generate-"] {
     display: inline-flex !important;
     align-items: center;
     gap: 6px;
-    /* Literal fallback: these buttons render in the media modal, outside the
-       token-scoped wrappers, so --atai-* vars are not in scope here. */
     margin-block-start: 6px;
+    padding-inline: 10px;
     font-weight: 500;
+    border-color: var(--at-border-color, #c3c4c7);
+    border-radius: var(--at-radius-sm, 4px);
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
+/* AI accent on the leading icon so the set reads as one system */
 [class*="at-ai-generate-"] .dashicons {
     font-size: 16px;
     height: 16px;
     width: 16px;
     line-height: 1;
+    color: var(--at-color-accent, #8a2be2);
+}
+
+[class*="at-ai-generate-"]:hover:not(:disabled),
+[class*="at-ai-generate-"]:focus:not(:disabled) {
+    border-color: var(--at-color-info, #2271b1);
+    color: var(--at-color-bold, #1d2327);
+    background: var(--at-bg-secondary, #f6f7f7);
+}
+
+[class*="at-ai-generate-"]:active:not(:disabled) {
+    background: #eef4fb;
+}
+
+[class*="at-ai-generate-"]:disabled,
+[class*="at-ai-generate-"].disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Loading state: muted, spinner icon (JS adds .is-loading + .dashicons.spin) */
+[class*="at-ai-generate-"].is-loading {
+    color: var(--at-text-muted, #646970);
+    cursor: progress;
+}
+
+[class*="at-ai-generate-"].is-loading .dashicons {
+    color: var(--at-text-muted, #646970);
+}
+
+/* Success state: brief green confirmation (JS adds .is-success) */
+[class*="at-ai-generate-"].is-success {
+    border-color: var(--at-color-success, #1a7f4b);
+    color: #0a5c33;
+    background: #edf7f0;
+    animation: at-ai-success-pop 0.25s ease;
+}
+
+[class*="at-ai-generate-"].is-success .dashicons {
+    color: var(--at-color-success, #1a7f4b);
+}
+
+@keyframes at-ai-success-pop {
+    0% { transform: scale(0.98); }
+    60% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    [class*="at-ai-generate-"].is-success {
+        animation: none;
+    }
 }
 
 /* -------------------------------------------------------------------------

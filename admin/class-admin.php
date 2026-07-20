@@ -309,6 +309,9 @@ class AT_WordPress_AI_Assistant_Admin {
                     <input type="checkbox" name="at_ai_processing_enabled" value="1" <?php checked($ai_enabled, '1'); ?>>
                     <?php _e('הפעל עיבוד AI לפוסט זה', 'wordpress-ai-assistant'); ?>
                 </label>
+                <span class="description at-ai-field-help">
+                    <?php _e('כשמסומן, פעולות AI אוטומטיות (כמו תיוג בשמירה) יחולו על פוסט זה. הכפתורים למטה פועלים ידנית בכל מקרה.', 'wordpress-ai-assistant'); ?>
+                </span>
             </p>
 
             <!-- Smart Taxonomy Tagging -->
@@ -336,35 +339,41 @@ class AT_WordPress_AI_Assistant_Admin {
                 <?php endforeach; ?>
             </div>
 
-            <p>
-                <button type="button" class="button button-secondary at-ai-suggest-taxonomies" data-post-id="<?php echo $post->ID; ?>">
-                    <span class="dashicons dashicons-tag"></span>
+            <p class="at-ai-action">
+                <button type="button" class="button button-secondary at-ai-action-btn at-ai-suggest-taxonomies" data-post-id="<?php echo $post->ID; ?>">
+                    <span class="dashicons dashicons-tag" aria-hidden="true"></span>
                     <?php _e('הצע תגיות וקטגוריות', 'wordpress-ai-assistant'); ?>
                 </button>
+                <span class="description at-ai-field-help">
+                    <?php _e('מנתח את תוכן הפוסט ומציע מונחים מהטקסונומיות שסימנת. ההצעות מוצגות לאישור — דבר לא מוחל עד שתלחץ "החל המלצות".', 'wordpress-ai-assistant'); ?>
+                </span>
             </p>
 
             <div id="at-ai-taxonomy-suggestions" style="display: none; margin-top: 10px;">
                 <div class="at-ai-suggestions-content notice notice-info inline"></div>
-                <p>
-                    <button type="button" class="button button-primary at-ai-apply-suggestions">
+                <p class="at-ai-action">
+                    <button type="button" class="button button-primary at-ai-action-btn at-ai-apply-suggestions">
                         <?php _e('החל המלצות', 'wordpress-ai-assistant'); ?>
                     </button>
+                    <span class="description at-ai-field-help">
+                        <?php _e('מוסיף לפוסט את המונחים שסימנת מתוך ההצעות. ניתן לבטל על ידי הסרת המונח מהפוסט.', 'wordpress-ai-assistant'); ?>
+                    </span>
                 </p>
             </div>
 
             <hr>
 
             <!-- SEO/AEO Optimization -->
-            <h4><span class="dashicons dashicons-search"></span> <?php _e('אופטימיזציה SEO ו-AEO', 'wordpress-ai-assistant'); ?></h4>
-            <p class="description">
-                <?php _e('שפר את התוכן למנועי חיפוש ומנועי תשובות AI', 'wordpress-ai-assistant'); ?>
-            </p>
+            <h4><span class="dashicons dashicons-search" aria-hidden="true"></span> <?php _e('אופטימיזציה SEO ו-AEO', 'wordpress-ai-assistant'); ?></h4>
 
-            <p>
-                <button type="button" class="button button-secondary at-ai-optimize-content" data-post-id="<?php echo $post->ID; ?>">
-                    <span class="dashicons dashicons-search"></span>
+            <p class="at-ai-action">
+                <button type="button" class="button button-secondary at-ai-action-btn at-ai-optimize-content" data-post-id="<?php echo $post->ID; ?>">
+                    <span class="dashicons dashicons-search" aria-hidden="true"></span>
                     <?php _e('בצע אופטימיזציה', 'wordpress-ai-assistant'); ?>
                 </button>
+                <span class="description at-ai-field-help">
+                    <?php _e('מנתח את התוכן ומחזיר המלצות לשיפור SEO ומנועי תשובות AI (מבנה, מילות מפתח, קריאות). ההמלצות מוצגות בלבד — התוכן אינו משתנה אוטומטית.', 'wordpress-ai-assistant'); ?>
+                </span>
             </p>
 
             <div id="at-ai-optimization-results" style="display: none; margin-top: 10px;"></div>

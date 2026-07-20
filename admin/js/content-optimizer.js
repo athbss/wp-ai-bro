@@ -11,6 +11,19 @@
     var suggestedTerms = {};
 
     /**
+     * Briefly flash a polished "success" state on an action button, then
+     * restore its original markup. Mirrors the media AI buttons.
+     */
+    function flashSuccess($button, originalHtml) {
+        $button.removeClass('is-loading').addClass('is-success').removeAttr('aria-busy')
+            .html('<span class="dashicons dashicons-yes" aria-hidden="true"></span> ' +
+                (atAiOptimizer.strings.success || ''));
+        setTimeout(function() {
+            $button.removeClass('is-success').html(originalHtml);
+        }, 2000);
+    }
+
+    /**
      * Initialize
      */
     $(document).ready(function() {
@@ -42,10 +55,11 @@
             return;
         }
 
-        // Disable button
+        // Disable button (loading state)
         var originalHtml = $button.html();
-        $button.prop('disabled', true).html(
-            '<span class="dashicons dashicons-update at-ai-spinner"></span> ' + 
+        var succeeded = false;
+        $button.prop('disabled', true).addClass('is-loading').attr('aria-busy', 'true').html(
+            '<span class="dashicons dashicons-update at-ai-spinner" aria-hidden="true"></span> ' +
             atAiOptimizer.strings.suggesting
         );
 
@@ -64,6 +78,9 @@
                     suggestedTerms = response.data.suggestions;
                     displayTaxonomySuggestions(response.data.suggestions);
                     displayUsageStats(response.data.usage);
+                    succeeded = true;
+                    $button.prop('disabled', false);
+                    flashSuccess($button, originalHtml);
                 } else {
                     alert(atAiOptimizer.strings.error + ': ' + (response.data || 'Unknown error'));
                 }
@@ -72,7 +89,9 @@
                 alert(atAiOptimizer.strings.error + ': ' + error);
             },
             complete: function() {
-                $button.prop('disabled', false).html(originalHtml);
+                if (!succeeded) {
+                    $button.prop('disabled', false).removeClass('is-loading').removeAttr('aria-busy').html(originalHtml);
+                }
             }
         });
     }
@@ -146,9 +165,9 @@
             return;
         }
 
-        // Disable button
+        // Disable button (loading state)
         var originalText = $button.text();
-        $button.prop('disabled', true).text(atAiOptimizer.strings.processing);
+        $button.prop('disabled', true).addClass('is-loading').attr('aria-busy', 'true').text(atAiOptimizer.strings.processing);
 
         // Make AJAX request
         $.ajax({
@@ -167,12 +186,12 @@
                     window.location.reload();
                 } else {
                     alert(atAiOptimizer.strings.error + ': ' + (response.data || 'Unknown error'));
-                    $button.prop('disabled', false).text(originalText);
+                    $button.prop('disabled', false).removeClass('is-loading').removeAttr('aria-busy').text(originalText);
                 }
             },
             error: function(xhr, status, error) {
                 alert(atAiOptimizer.strings.error + ': ' + error);
-                $button.prop('disabled', false).text(originalText);
+                $button.prop('disabled', false).removeClass('is-loading').removeAttr('aria-busy').text(originalText);
             }
         });
     }
@@ -184,10 +203,11 @@
         var $button = $(this);
         var postId = $button.data('post-id');
 
-        // Disable button
+        // Disable button (loading state)
         var originalHtml = $button.html();
-        $button.prop('disabled', true).html(
-            '<span class="dashicons dashicons-update at-ai-spinner"></span> ' + 
+        var succeeded = false;
+        $button.prop('disabled', true).addClass('is-loading').attr('aria-busy', 'true').html(
+            '<span class="dashicons dashicons-update at-ai-spinner" aria-hidden="true"></span> ' +
             atAiOptimizer.strings.optimizing
         );
 
@@ -204,6 +224,9 @@
                 if (response.success) {
                     displayOptimizationResults(response.data.optimization);
                     displayUsageStats(response.data.usage);
+                    succeeded = true;
+                    $button.prop('disabled', false);
+                    flashSuccess($button, originalHtml);
                 } else {
                     alert(atAiOptimizer.strings.error + ': ' + (response.data || 'Unknown error'));
                 }
@@ -212,7 +235,9 @@
                 alert(atAiOptimizer.strings.error + ': ' + error);
             },
             complete: function() {
-                $button.prop('disabled', false).html(originalHtml);
+                if (!succeeded) {
+                    $button.prop('disabled', false).removeClass('is-loading').removeAttr('aria-busy').html(originalHtml);
+                }
             }
         });
     }
