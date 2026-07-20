@@ -127,21 +127,6 @@ class AT_WordPress_AI_Assistant_Public {
     }
 
     /**
-     * Process media upload with AI features
-     *
-     * @since    1.0.0
-     * @param    int     $attachment_id    The attachment ID.
-     */
-    public function process_media_upload($attachment_id) {
-        // Check if auto-generate alt text is enabled
-        $auto_alt = at_ai_assistant_get_option('auto_generate_alt_text', true);
-        
-        if ($auto_alt) {
-            $this->process_image_alt($attachment_id);
-        }
-    }
-
-    /**
      * Process auto tagging for post
      *
      * @since    1.0.0
@@ -149,50 +134,11 @@ class AT_WordPress_AI_Assistant_Public {
      * @param    WP_Post $post       The post object.
      */
     private function process_auto_tagging($post_id, $post) {
-        if (empty($post->post_content)) {
-            return;
-        }
-
         try {
             $auto_tagger = new AT_Auto_Tagger();
             $auto_tagger->auto_tag_post($post_id, $post);
         } catch (Exception $e) {
             at_ai_assistant_log('auto_tag', 'error', $e->getMessage(), array('error' => $e->getMessage()), $post_id);
-        }
-    }
-
-    /**
-     * Process image alt text generation
-     *
-     * @since    1.0.0
-     * @param    int     $attachment_id    The attachment ID.
-     */
-    private function process_image_alt($attachment_id) {
-        $mime_type = get_post_mime_type($attachment_id);
-        
-        // Only process images
-        if (strpos($mime_type, 'image/') !== 0) {
-            return;
-        }
-
-        // Check if alt text already exists
-        $existing_alt = get_post_meta($attachment_id, '_wp_attachment_image_alt', true);
-        if (!empty($existing_alt)) {
-            return;
-        }
-
-        try {
-            $alt_generator = new AT_Image_Alt_Generator();
-            $result = $alt_generator->generate_alt_text($attachment_id);
-
-            if (!is_wp_error($result)) {
-                $alt_text = get_post_meta($attachment_id, '_wp_attachment_image_alt', true);
-                if (!empty($alt_text)) {
-                    at_ai_assistant_log('image_alt', 'success', sprintf(__('Generated alt text: %s', 'wordpress-ai-assistant'), $alt_text), array('alt_text' => $alt_text), $attachment_id, null);
-                }
-            }
-        } catch (Exception $e) {
-            at_ai_assistant_log('image_alt', 'error', $e->getMessage(), array('error' => $e->getMessage()), null, null);
         }
     }
 

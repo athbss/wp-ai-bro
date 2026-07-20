@@ -64,7 +64,7 @@
 
             $.post(at_ai_admin.ajax_url, {
                 action: 'at_ai_generate_alt_text',
-                nonce: at_ai_admin.nonce,
+                nonce: at_ai_admin.image_nonce,
                 attachment_id: attachmentId
             })
             .done(function(response) {

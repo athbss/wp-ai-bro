@@ -28,8 +28,12 @@ class AT_Auto_Tagger {
     /**
      * Constructor
      */
-    public function __construct() {
+    public function __construct($register_hooks = true) {
         $this->ai_manager = AT_AI_Manager::get_instance();
+
+        if (!$register_hooks) {
+            return;
+        }
 
         // Hook into WordPress
         add_action('save_post', array($this, 'auto_tag_post'), 20, 2); // Run after other save operations
@@ -78,11 +82,6 @@ class AT_Auto_Tagger {
         // Check if this post type is enabled for AI processing
         $enabled_post_types = at_ai_assistant_get_option('enabled_post_types', array('post', 'page'));
         if (!in_array($post->post_type, $enabled_post_types)) {
-            return;
-        }
-
-        // Check if post has content
-        if (empty($post->post_title) && empty($post->post_content)) {
             return;
         }
 
@@ -216,9 +215,51 @@ class AT_Auto_Tagger {
             if (!empty($description)) {
                 $content .= $description . ' ';
             }
+        } else {
+            $content .= $this->extract_custom_field_content($object->ID);
         }
 
-        return trim($content);
+        return trim(wp_html_excerpt($content, 40000, ''));
+    }
+
+    /**
+     * Extract usable custom-field values for content classification.
+     *
+     * @param int $post_id Post ID.
+     * @return string
+     */
+    private function extract_custom_field_content($post_id) {
+        $meta = get_post_meta($post_id);
+        $parts = array();
+        $blocked = array('api_key', 'token', 'secret', 'password', 'nonce');
+
+        foreach ($meta as $key => $values) {
+            $key = (string) $key;
+            $lower_key = strtolower($key);
+            foreach ($blocked as $blocked_key) {
+                if (strpos($lower_key, $blocked_key) !== false) {
+                    continue 2;
+                }
+            }
+
+            // ACF values normally use a public meta key; underscore keys store definitions.
+            if (strpos($key, '_') === 0) {
+                continue;
+            }
+
+            foreach ((array) $values as $value) {
+                if (is_array($value) || is_object($value)) {
+                    continue;
+                }
+                $value = trim(wp_strip_all_tags((string) $value));
+                if ($value !== '') {
+                    $parts[] = sanitize_text_field($key) . ': ' . $value;
+                }
+            }
+        }
+
+        $parts = apply_filters('at_ai_assistant_taggable_meta_parts', $parts, $post_id);
+        return empty($parts) ? '' : "\n\n" . implode("\n", $parts) . ' ';
     }
 
     /**
@@ -235,7 +276,7 @@ class AT_Auto_Tagger {
         $post_taxonomies = get_object_taxonomies($post_type, 'objects');
 
         foreach ($post_taxonomies as $taxonomy) {
-            if (!$taxonomy->public || !in_array($taxonomy->name, $selected_taxonomies, true)) {
+            if (!$taxonomy->show_ui || !in_array($taxonomy->name, $selected_taxonomies, true)) {
                 continue;
             }
 
@@ -332,6 +373,38 @@ class AT_Auto_Tagger {
     }
 
     /**
+     * Generate and apply tags for a post from a button, Ability, or automation.
+     *
+     * @param int $post_id Post ID.
+     * @return array|WP_Error
+     */
+    public function process_post($post_id) {
+        $post = get_post($post_id);
+        if (!$post) {
+            return new WP_Error('invalid_post', __('Post not found.', 'wordpress-ai-assistant'));
+        }
+
+        $content = $this->extract_content($post);
+        if ($content === '') {
+            return new WP_Error('empty_content', __('No content found to analyze.', 'wordpress-ai-assistant'));
+        }
+
+        $tags = $this->ai_manager->generate_tags(
+            $content,
+            $this->get_available_taxonomies($post->post_type),
+            at_ai_assistant_get_post_language($post_id)
+        );
+        if (is_wp_error($tags)) {
+            return $tags;
+        }
+
+        $this->apply_generated_tags($post_id, $post, $tags);
+        update_post_meta($post_id, '_at_ai_tags_generated', time());
+
+        return $tags;
+    }
+
+    /**
      * AJAX handler for generating tags
      */
     public function ajax_generate_tags() {
@@ -353,7 +426,7 @@ class AT_Auto_Tagger {
         }
 
         $object = get_post($object_id);
-        if (!$object) {
+        if (!$object || !current_user_can('edit_post', $object_id)) {
             wp_send_json_error(__('Object not found', 'wordpress-ai-assistant'));
         }
 
@@ -405,7 +478,7 @@ class AT_Auto_Tagger {
         }
 
         $object = get_post($object_id);
-        if (!$object) {
+        if (!$object || !current_user_can('edit_post', $object_id)) {
             wp_send_json_error(__('Object not found', 'wordpress-ai-assistant'));
         }
 
@@ -439,9 +512,14 @@ class AT_Auto_Tagger {
             'ajax_url' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('at_ai_generate_tags'),
             'apply_nonce' => wp_create_nonce('at_ai_apply_tags'),
+            'post_id' => get_the_ID(),
+            'post_type' => get_post_type(),
             'strings' => array(
                 'generating' => __('Generating tags...', 'wordpress-ai-assistant'),
                 'applying' => __('Applying tags...', 'wordpress-ai-assistant'),
+                'generate' => __('Generate Tags', 'wordpress-ai-assistant'),
+                'apply' => __('Apply Tags', 'wordpress-ai-assistant'),
+                'generate_first' => __('Please generate tags first', 'wordpress-ai-assistant'),
                 'error' => __('Error occurred', 'wordpress-ai-assistant'),
                 'success' => __('Tags generated successfully', 'wordpress-ai-assistant'),
                 'applied' => __('Tags applied successfully', 'wordpress-ai-assistant'),
@@ -480,6 +558,12 @@ class AT_Auto_Tagger {
 
         $generated_tags = get_post_meta($post->ID, '_at_ai_generated_tags', true) ?: array();
 
+        wp_add_inline_script(
+            'at-ai-auto-tagger',
+            'at_ai_tagger.post_id = ' . (int) $post->ID . '; at_ai_tagger.post_type = ' . wp_json_encode($post->post_type) . '; at_ai_tagger.initial_tags = ' . wp_json_encode($generated_tags) . ';',
+            'before'
+        );
+
         wp_nonce_field('at_ai_tagging_meta', 'at_ai_tagging_nonce');
         ?>
         <div class="at-ai-tagging-meta">
@@ -495,6 +579,15 @@ class AT_Auto_Tagger {
                 <?php if (!empty($generated_tags)): ?>
                     <strong><?php _e('AI Generated Tags:', 'wordpress-ai-assistant'); ?></strong>
                     <div style="margin: 5px 0;">
+                        <?php if (!empty($generated_tags['taxonomies']) && is_array($generated_tags['taxonomies'])): ?>
+                            <?php foreach ($generated_tags['taxonomies'] as $taxonomy_name => $terms): ?>
+                                <?php $taxonomy = get_taxonomy($taxonomy_name); ?>
+                                <div><strong><?php echo esc_html($taxonomy ? $taxonomy->labels->singular_name : $taxonomy_name); ?>:</strong>
+                                    <?php echo esc_html(implode(', ', (array) $terms)); ?>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+
                         <?php if (!empty($generated_tags['tags'])): ?>
                             <div><strong><?php _e('Tags:', 'wordpress-ai-assistant'); ?></strong>
                                 <?php echo esc_html(implode(', ', $generated_tags['tags'])); ?>
@@ -531,81 +624,6 @@ class AT_Auto_Tagger {
             </div>
         </div>
 
-        <script type="text/javascript">
-        jQuery(document).ready(function($) {
-            var generatedTags = <?php echo json_encode($generated_tags); ?>;
-
-            $('#at_ai_generate_tags_btn').on('click', function() {
-                $(this).prop('disabled', true).text(at_ai_tagger.strings.generating);
-
-                $.post(ajaxurl, {
-                    action: 'at_ai_generate_tags',
-                    nonce: at_ai_tagger.nonce,
-                    object_id: <?php echo $post->ID; ?>,
-                    object_type: '<?php echo $post->post_type; ?>'
-                })
-                .done(function(response) {
-                    if (response.success) {
-                        generatedTags = response.data.tags;
-                        displayTagsPreview(generatedTags);
-                        $('#at_ai_tags_preview').show();
-                    } else {
-                        alert(response.data || at_ai_tagger.strings.error);
-                    }
-                })
-                .fail(function() {
-                    alert(at_ai_tagger.strings.error);
-                })
-                .always(function() {
-                    $('#at_ai_generate_tags_btn').prop('disabled', false).text('<?php _e("Generate Tags", "wordpress-ai-assistant"); ?>');
-                });
-            });
-
-            $('#at_ai_apply_tags_btn').on('click', function() {
-                if (!generatedTags || Object.keys(generatedTags).length === 0) {
-                    alert('<?php _e("Please generate tags first", "wordpress-ai-assistant"); ?>');
-                    return;
-                }
-
-                $(this).prop('disabled', true).text(at_ai_tagger.strings.applying);
-
-                $.post(ajaxurl, {
-                    action: 'at_ai_apply_tags',
-                    nonce: at_ai_tagger.apply_nonce,
-                    object_id: <?php echo $post->ID; ?>,
-                    tags: generatedTags
-                })
-                .done(function(response) {
-                    if (response.success) {
-                        alert(at_ai_tagger.strings.applied);
-                        location.reload(); // Reload to show applied tags
-                    } else {
-                        alert(response.data || at_ai_tagger.strings.error);
-                    }
-                })
-                .fail(function() {
-                    alert(at_ai_tagger.strings.error);
-                })
-                .always(function() {
-                    $('#at_ai_apply_tags_btn').prop('disabled', false).text('<?php _e("Apply Tags", "wordpress-ai-assistant"); ?>');
-                });
-            });
-
-            function displayTagsPreview(tags) {
-                var html = '';
-                if (tags.tags && tags.tags.length > 0) {
-                    html += '<div><strong><?php _e("Tags:", "wordpress-ai-assistant"); ?></strong> ' + tags.tags.join(', ') + '</div>';
-                }
-                if (tags.categories && tags.categories.length > 0) {
-                    html += '<div><strong><?php _e("Categories:", "wordpress-ai-assistant"); ?></strong> ' + tags.categories.join(', ') + '</div>';
-                }
-                if (tags.audience && tags.audience.length > 0) {
-                    html += '<div><strong><?php _e("Audience:", "wordpress-ai-assistant"); ?></strong> ' + tags.audience.join(', ') + '</div>';
-                }
-                $('#at_ai_tags_content').html(html);
-            }
-        });
-        </script>
         <?php
     }
 
@@ -683,10 +701,10 @@ class AT_Auto_Tagger {
             $selected = array();
         }
 
-        $public_taxonomies = get_taxonomies(array('public' => true), 'objects');
+        $available_taxonomies = get_taxonomies(array('show_ui' => true), 'objects');
         ?>
         <fieldset>
-            <?php foreach ($public_taxonomies as $taxonomy): ?>
+            <?php foreach ($available_taxonomies as $taxonomy): ?>
                 <label style="display: block; margin-bottom: 6px;">
                     <input type="checkbox"
                            name="at_ai_assistant_tagging_taxonomies[]"
@@ -697,7 +715,7 @@ class AT_Auto_Tagger {
             <?php endforeach; ?>
         </fieldset>
         <p class="description">
-            <?php _e('Choose which taxonomies AI can tag. If none are selected, all public taxonomies for the post type will be used.', 'wordpress-ai-assistant'); ?>
+            <?php _e('Choose which taxonomies AI can tag. If none are selected, all taxonomies with an admin interface for the post type will be used.', 'wordpress-ai-assistant'); ?>
         </p>
         <?php
     }
@@ -712,7 +730,7 @@ class AT_Auto_Tagger {
         $post_taxonomies = get_object_taxonomies($post_type, 'objects');
         $available = array();
         foreach ($post_taxonomies as $taxonomy) {
-            if ($taxonomy->public) {
+            if ($taxonomy->show_ui) {
                 $available[] = $taxonomy->name;
             }
         }

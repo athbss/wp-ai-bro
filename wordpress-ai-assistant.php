@@ -3,7 +3,7 @@
  * Plugin Name: WordPress AI Assistant
  * Plugin URI: https://github.com/athbss/wp-ai-bro
  * Description: תוסף WordPress מתקדם המספק יכולות בינה מלאכותית לשיפור תהליכי יצירת תוכן, נגישות וחוויית המשתמש
- * Version: 1.8.3
+ * Version: 1.9.0
  * Author: Amit Trabelsi
  * Author URI: https://amit-trabelsi.co.il
  * License: GPL v2 or later
@@ -11,7 +11,7 @@
  * Text Domain: wordpress-ai-assistant
  * Domain Path: /languages
  * Requires at least: 5.0
- * Tested up to: 6.4
+ * Tested up to: 7.0.2
  * Requires PHP: 7.4
  * Network: false
  * Update URI: https://updates.amiteam.io/wordpress-ai-assistant/plugin-info.json
@@ -25,7 +25,7 @@ if (!defined('WPINC')) {
 /**
  * Currently plugin version.
  */
-define('WORDPRESS_AI_ASSISTANT_VERSION', '1.8.3');
+define('WORDPRESS_AI_ASSISTANT_VERSION', '1.9.0');
 
 /**
  * Plugin directory path

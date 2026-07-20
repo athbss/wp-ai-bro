@@ -24,9 +24,14 @@ class AT_OpenAI_Provider extends AT_AI_Provider {
     public function __construct() {
         $this->name = 'openai';
         $this->display_name = 'OpenAI';
-        $this->default_model = 'gpt-5.1';
+        $this->default_model = 'gpt-5.6-terra';
         $this->available_models = array(
-            // GPT-5 Series (Latest)
+            // GPT-5.6 series.
+            'gpt-5.6' => 'GPT-5.6 Sol - highest quality',
+            'gpt-5.6-terra' => 'GPT-5.6 Terra - balanced (recommended)',
+            'gpt-5.6-luna' => 'GPT-5.6 Luna - high-volume and efficient',
+            // GPT-5 Series.
+            'gpt-5.2' => 'GPT-5.2 - previous flagship',
             'gpt-5.1' => 'GPT-5.1 ⚡ Flagship (fast, mid-cost)',
             'gpt-5-mini' => 'GPT-5 mini ⚡💰 Cheaper/faster tier',
             'gpt-5-nano' => 'GPT-5 nano ⚡⚡💰💰 Fastest/cheapest',
@@ -42,10 +47,15 @@ class AT_OpenAI_Provider extends AT_AI_Provider {
             'o3-mini' => 'o3-mini 🧠⚡ Small reasoning',
         );
 
-        // Pricing per 1M tokens (as of Dec 2025)
+        // Standard API pricing per 1M tokens (July 2026).
         $this->pricing = array(
             'input' => array(
-                // GPT-5 Series
+                // GPT-5.6 series.
+                'gpt-5.6' => 5.00,
+                'gpt-5.6-terra' => 2.50,
+                'gpt-5.6-luna' => 1.00,
+                // GPT-5 Series.
+                'gpt-5.2' => 1.75,
                 'gpt-5.1' => 1.25,
                 'gpt-5-mini' => 0.25,
                 'gpt-5-nano' => 0.05,
@@ -61,7 +71,12 @@ class AT_OpenAI_Provider extends AT_AI_Provider {
                 'o3-mini' => 1.10,
             ),
             'output' => array(
-                // GPT-5 Series
+                // GPT-5.6 series.
+                'gpt-5.6' => 30.00,
+                'gpt-5.6-terra' => 15.00,
+                'gpt-5.6-luna' => 6.00,
+                // GPT-5 Series.
+                'gpt-5.2' => 14.00,
                 'gpt-5.1' => 10.00,
                 'gpt-5-mini' => 2.00,
                 'gpt-5-nano' => 0.40,
@@ -119,24 +134,35 @@ class AT_OpenAI_Provider extends AT_AI_Provider {
         $max_tokens = isset($options['max_tokens']) ? $options['max_tokens'] : 1000;
         $temperature = isset($options['temperature']) ? $options['temperature'] : 0.7;
 
-        $url = 'https://api.openai.com/v1/chat/completions';
+        $url = 'https://api.openai.com/v1/responses';
+        $payload = array(
+            'model' => $model,
+            'input' => array(
+                array(
+                    'role' => 'user',
+                    'content' => array(
+                        array(
+                            'type' => 'input_text',
+                            'text' => $prompt,
+                        ),
+                    ),
+                ),
+            ),
+            'max_output_tokens' => $max_tokens,
+            'store' => false,
+        );
+
+        if (!$this->is_reasoning_model($model)) {
+            $payload['temperature'] = $temperature;
+        }
+
         $args = array(
             'method' => 'POST',
             'headers' => array(
                 'Authorization' => 'Bearer ' . $this->api_key,
                 'Content-Type' => 'application/json',
             ),
-            'body' => json_encode(array(
-                'model' => $model,
-                'messages' => array(
-                    array(
-                        'role' => 'user',
-                        'content' => $prompt,
-                    ),
-                ),
-                'max_tokens' => $max_tokens,
-                'temperature' => $temperature,
-            )),
+            'body' => wp_json_encode($payload),
         );
 
         $response = $this->make_request($url, $args);
@@ -145,15 +171,16 @@ class AT_OpenAI_Provider extends AT_AI_Provider {
             return $response;
         }
 
-        if (!isset($response['choices'][0]['message']['content'])) {
+        $text = isset($response['output_text']) ? $response['output_text'] : $this->extract_response_text($response);
+        if ($text === '') {
             return new WP_Error('invalid_response', __('Invalid response from OpenAI API', 'wordpress-ai-assistant'));
         }
 
         return array(
-            'text' => $response['choices'][0]['message']['content'],
+            'text' => $text,
             'usage' => array(
-                'input_tokens' => $response['usage']['prompt_tokens'] ?? 0,
-                'output_tokens' => $response['usage']['completion_tokens'] ?? 0,
+                'input_tokens' => $response['usage']['input_tokens'] ?? 0,
+                'output_tokens' => $response['usage']['output_tokens'] ?? 0,
                 'total_tokens' => $response['usage']['total_tokens'] ?? 0,
             ),
             'model' => $model,
@@ -172,36 +199,35 @@ class AT_OpenAI_Provider extends AT_AI_Provider {
             return new WP_Error('missing_api_key', __('OpenAI API key is required', 'wordpress-ai-assistant'));
         }
 
-        $model = isset($options['model']) ? $options['model'] : 'gpt-4o-mini';
+        $model = isset($options['model']) ? $options['model'] : $this->get_current_model();
         $prompt = isset($options['prompt']) ? $options['prompt'] : 'Describe this image in detail, including any text visible in the image.';
 
-        $url = 'https://api.openai.com/v1/chat/completions';
+        $url = 'https://api.openai.com/v1/responses';
         $args = array(
             'method' => 'POST',
             'headers' => array(
                 'Authorization' => 'Bearer ' . $this->api_key,
                 'Content-Type' => 'application/json',
             ),
-            'body' => json_encode(array(
+            'body' => wp_json_encode(array(
                 'model' => $model,
-                'messages' => array(
+                'input' => array(
                     array(
                         'role' => 'user',
                         'content' => array(
                             array(
-                                'type' => 'text',
+                                'type' => 'input_text',
                                 'text' => $prompt,
                             ),
                             array(
-                                'type' => 'image_url',
-                                'image_url' => array(
-                                    'url' => $image_url,
-                                ),
+                                'type' => 'input_image',
+                                'image_url' => $image_url,
                             ),
                         ),
                     ),
                 ),
-                'max_tokens' => 500,
+                'max_output_tokens' => 500,
+                'store' => false,
             )),
         );
 
@@ -211,19 +237,48 @@ class AT_OpenAI_Provider extends AT_AI_Provider {
             return $response;
         }
 
-        if (!isset($response['choices'][0]['message']['content'])) {
+        $description = isset($response['output_text']) ? $response['output_text'] : $this->extract_response_text($response);
+        if ($description === '') {
             return new WP_Error('invalid_response', __('Invalid response from OpenAI API', 'wordpress-ai-assistant'));
         }
 
         return array(
-            'description' => $response['choices'][0]['message']['content'],
+            'description' => $description,
             'usage' => array(
-                'input_tokens' => $response['usage']['prompt_tokens'] ?? 0,
-                'output_tokens' => $response['usage']['completion_tokens'] ?? 0,
+                'input_tokens' => $response['usage']['input_tokens'] ?? 0,
+                'output_tokens' => $response['usage']['output_tokens'] ?? 0,
                 'total_tokens' => $response['usage']['total_tokens'] ?? 0,
             ),
             'model' => $model,
         );
+    }
+
+    /**
+     * Extract text from a Responses API payload when output_text is unavailable.
+     *
+     * @param array $response Response body.
+     * @return string
+     */
+    private function extract_response_text($response) {
+        $parts = array();
+        foreach ((array) ($response['output'] ?? array()) as $item) {
+            foreach ((array) ($item['content'] ?? array()) as $content) {
+                if (($content['type'] ?? '') === 'output_text' && isset($content['text'])) {
+                    $parts[] = $content['text'];
+                }
+            }
+        }
+        return trim(implode("\n", $parts));
+    }
+
+    /**
+     * Reasoning models do not accept all sampling controls.
+     *
+     * @param string $model Model ID.
+     * @return bool
+     */
+    private function is_reasoning_model($model) {
+        return strpos($model, 'gpt-5') === 0 || strpos($model, 'o') === 0;
     }
 
     /**

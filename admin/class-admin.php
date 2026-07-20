@@ -113,6 +113,7 @@ class AT_WordPress_AI_Assistant_Admin {
         wp_localize_script($this->plugin_name, 'at_ai_admin', array(
             'ajax_url' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('at_ai_admin_nonce'),
+            'image_nonce' => wp_create_nonce('at_ai_generate_alt_text'),
             'strings' => array(
                 'testing' => __('בודק חיבור...', 'wordpress-ai-assistant'),
                 'test_success' => __('חיבור הצליח!', 'wordpress-ai-assistant'),

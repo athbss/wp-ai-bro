@@ -142,6 +142,7 @@ class AT_WordPress_AI_Assistant_Core {
         require_once WORDPRESS_AI_ASSISTANT_PATH . 'includes/features/class-auto-tagger.php';
         require_once WORDPRESS_AI_ASSISTANT_PATH . 'includes/features/class-media-ai-generator.php';
         require_once WORDPRESS_AI_ASSISTANT_PATH . 'includes/features/class-content-optimizer.php';
+        require_once WORDPRESS_AI_ASSISTANT_PATH . 'includes/class-ai-abilities.php';
 
         /**
          * Initialize AI Features
@@ -151,6 +152,7 @@ class AT_WordPress_AI_Assistant_Core {
         $this->auto_tagger = new AT_Auto_Tagger();
         $this->media_ai_generator = new AT_Media_AI_Generator();
         $this->content_optimizer = new AT_Content_Optimizer();
+        new AT_AI_Abilities();
         
         // Initialize Chat feature - will check if enabled internally
         require_once WORDPRESS_AI_ASSISTANT_PATH . 'includes/features/class-ai-chat.php';
@@ -248,7 +250,6 @@ class AT_WordPress_AI_Assistant_Core {
         
         // Content processing hooks
         $this->loader->add_action('save_post', $plugin_public, 'process_post_save', 10, 2);
-        $this->loader->add_action('add_attachment', $plugin_public, 'process_media_upload');
         
         // TTS hooks
         $this->loader->add_action('wp_footer', $plugin_public, 'add_tts_player');

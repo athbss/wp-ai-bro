@@ -28,42 +28,21 @@ class AT_Image_Alt_Generator {
     /**
      * Constructor
      */
-    public function __construct() {
+    public function __construct($register_hooks = true) {
         $this->ai_manager = AT_AI_Manager::get_instance();
 
-        // Hook into WordPress
-        add_action('add_attachment', array($this, 'generate_alt_text_on_upload'), 10, 1);
+        if (!$register_hooks) {
+            return;
+        }
+
+        // Hook into WordPress.
         add_filter('wp_generate_attachment_metadata', array($this, 'generate_alt_text_for_images'), 10, 2);
+        add_action('at_ai_generate_alt_text_delayed', array($this, 'generate_alt_text'), 10, 1);
+        add_filter('attachment_fields_to_edit', array($this, 'add_attachment_action'), 10, 2);
 
         // AJAX handlers
         add_action('wp_ajax_at_ai_generate_alt_text', array($this, 'ajax_generate_alt_text'));
         add_action('wp_ajax_at_ai_regenerate_alt_text', array($this, 'ajax_regenerate_alt_text'));
-    }
-
-    /**
-     * Generate alt text when attachment is uploaded
-     *
-     * @param int $attachment_id
-     */
-    public function generate_alt_text_on_upload($attachment_id) {
-        // Check if auto-generation is enabled
-        if (!at_ai_assistant_get_option('auto_generate_alt_text', true)) {
-            return;
-        }
-
-        // Check if it's an image
-        if (!wp_attachment_is_image($attachment_id)) {
-            return;
-        }
-
-        // Check if alt text already exists
-        $alt_text = get_post_meta($attachment_id, '_wp_attachment_image_alt', true);
-        if (!empty($alt_text)) {
-            return;
-        }
-
-        // Generate alt text
-        $this->generate_alt_text($attachment_id);
     }
 
     /**
@@ -105,14 +84,22 @@ class AT_Image_Alt_Generator {
      * @return bool|WP_Error
      */
     public function generate_alt_text($attachment_id) {
-        // Get image URL
+        if (!$this->is_supported_image($attachment_id)) {
+            return new WP_Error('unsupported_attachment', __('The selected attachment is not a supported image.', 'wordpress-ai-assistant'));
+        }
+
+        $image_input = $this->get_image_input($attachment_id);
+        if (is_wp_error($image_input)) {
+            return $image_input;
+        }
+
         $image_url = wp_get_attachment_url($attachment_id);
         if (!$image_url) {
             return new WP_Error('invalid_attachment', __('Invalid attachment', 'wordpress-ai-assistant'));
         }
 
         // Analyze image with AI
-        $analysis = $this->ai_manager->analyze_image($image_url, array(
+        $analysis = $this->ai_manager->analyze_image($image_input, array(
             'prompt' => $this->get_alt_text_prompt($attachment_id),
         ));
 
@@ -137,7 +124,61 @@ class AT_Image_Alt_Generator {
             'usage' => $analysis['usage'],
         ), $attachment_id);
 
-        return $updated;
+        return $updated || get_post_meta($attachment_id, '_wp_attachment_image_alt', true) === $alt_text;
+    }
+
+    /**
+     * Build an image input that OpenAI can read even when the site is private.
+     *
+     * @param int $attachment_id Attachment ID.
+     * @return string|WP_Error
+     */
+    private function get_image_input($attachment_id) {
+        $file = get_attached_file($attachment_id);
+        $mime_type = get_post_mime_type($attachment_id);
+
+        if (!$file || !is_readable($file) || !$mime_type) {
+            $url = wp_get_attachment_url($attachment_id);
+            return $url ? $url : new WP_Error('invalid_attachment', __('Unable to read the selected image.', 'wordpress-ai-assistant'));
+        }
+
+        $max_bytes = (int) apply_filters('at_ai_assistant_max_inline_image_bytes', 10 * MB_IN_BYTES, $attachment_id);
+        $file_size = filesize($file);
+        if ($file_size === false || $file_size > $max_bytes) {
+            return new WP_Error('image_too_large', __('The selected image is too large for AI analysis.', 'wordpress-ai-assistant'));
+        }
+
+        $contents = file_get_contents($file);
+        if ($contents === false) {
+            return new WP_Error('image_read_failed', __('Unable to read the selected image.', 'wordpress-ai-assistant'));
+        }
+
+        return 'data:' . $mime_type . ';base64,' . base64_encode($contents);
+    }
+
+    /**
+     * Add a one-click action in attachment details, including the media modal.
+     *
+     * @param array   $fields Attachment fields.
+     * @param WP_Post $post   Attachment post.
+     * @return array
+     */
+    public function add_attachment_action($fields, $post) {
+        if (!$this->is_supported_image($post->ID) || !current_user_can('edit_post', $post->ID)) {
+            return $fields;
+        }
+
+        $fields['at_ai_generate_alt_text'] = array(
+            'label' => __('AI accessibility', 'wordpress-ai-assistant'),
+            'input' => 'html',
+            'html'  => sprintf(
+                '<button type="button" class="button at-ai-generate-alt-text" data-attachment-id="%d">%s</button>',
+                (int) $post->ID,
+                esc_html__('Generate alt text with AI', 'wordpress-ai-assistant')
+            ),
+        );
+
+        return $fields;
     }
 
     /**
@@ -183,7 +224,11 @@ class AT_Image_Alt_Generator {
         $description = trim($description);
 
         // If description is too long, truncate it
-        if (strlen($description) > 125) {
+        if (function_exists('mb_strlen') && function_exists('mb_substr')) {
+            if (mb_strlen($description) > 125) {
+                $description = mb_substr($description, 0, 122) . '...';
+            }
+        } elseif (strlen($description) > 125) {
             $description = substr($description, 0, 122) . '...';
         }
 
@@ -224,7 +269,7 @@ class AT_Image_Alt_Generator {
 
         $attachment_id = intval($_POST['attachment_id'] ?? 0);
 
-        if (!$attachment_id) {
+        if (!$attachment_id || !current_user_can('edit_post', $attachment_id)) {
             wp_send_json_error(__('Invalid attachment ID', 'wordpress-ai-assistant'));
         }
 
@@ -258,7 +303,7 @@ class AT_Image_Alt_Generator {
 
         $attachment_id = intval($_POST['attachment_id'] ?? 0);
 
-        if (!$attachment_id) {
+        if (!$attachment_id || !current_user_can('edit_post', $attachment_id)) {
             wp_send_json_error(__('Invalid attachment ID', 'wordpress-ai-assistant'));
         }
 

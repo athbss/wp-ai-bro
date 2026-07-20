@@ -153,7 +153,7 @@ class AT_WordPress_AI_Assistant_Activator {
             'auto_categorize_enabled' => false,
             'auto_tag_media_enabled' => true,
             'ai_credentials' => array(),
-            'openai_model' => 'gpt-4o-mini',
+            'openai_model' => 'gpt-5.6-terra',
             'anthropic_model' => 'claude-3-haiku-20240307',
             'google_model' => 'gemini-pro',
             // Chat settings
