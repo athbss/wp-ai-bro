@@ -969,8 +969,8 @@ class AT_WordPress_AI_Assistant_Admin {
                             <td>
                                 <?php
                                 $provider_instance = $this->ai_manager->get_provider($provider);
-                                $current_model = at_ai_assistant_get_option($provider . '_model', '');
                                 $available_models = $provider_instance ? $provider_instance->get_available_models() : array();
+                                $current_model = $provider_instance ? $provider_instance->get_current_model() : at_ai_assistant_get_option($provider . '_model', '');
                                 ?>
                                 <select id="at_ai_<?php echo $provider; ?>_model"
                                         name="at_ai_assistant_<?php echo $provider; ?>_model">

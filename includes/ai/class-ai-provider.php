@@ -113,7 +113,15 @@ abstract class AT_AI_Provider {
      * @return string
      */
     public function get_current_model() {
-        return at_ai_assistant_get_option($this->name . '_model', $this->default_model);
+        $model = at_ai_assistant_get_option($this->name . '_model', $this->default_model);
+
+        // WordPress returns an explicitly saved empty value instead of the default.
+        // Never send an empty model ID to an AI provider.
+        if (!is_string($model) || trim($model) === '') {
+            return $this->default_model;
+        }
+
+        return trim($model);
     }
 
     /**
