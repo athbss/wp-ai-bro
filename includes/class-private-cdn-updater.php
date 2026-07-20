@@ -33,6 +33,7 @@ class AT_AI_Private_CDN_Updater {
 
         add_filter('plugins_api', array($this, 'plugin_information'), 10, 3);
         add_action('upgrader_process_complete', array($this, 'clear_cache_after_upgrade'), 10, 2);
+        add_action('load-plugins.php', array($this, 'refresh_update_check'));
     }
 
     public function filter_update($update, $plugin_data, $plugin_file, $locales) {
@@ -102,6 +103,29 @@ class AT_AI_Private_CDN_Updater {
         }
     }
 
+    /**
+     * Refresh private updates from the Plugins screen at a controlled interval.
+     *
+     * WordPress normally checks plugin updates only once per hour on this screen,
+     * which can leave a private release invisible immediately after publication.
+     */
+    public function refresh_update_check() {
+        if (!current_user_can('update_plugins')) {
+            return;
+        }
+
+        $refresh_key = 'at_cdn_update_check_' . md5($this->plugin_file);
+        if (get_site_transient($refresh_key)) {
+            return;
+        }
+
+        delete_site_transient($this->cache_key);
+        set_site_transient($refresh_key, time(), 15 * MINUTE_IN_SECONDS);
+
+        // A non-empty argument bypasses WordPress's normal one-hour screen cache.
+        wp_update_plugins(array('at_cdn_plugin' => $this->slug));
+    }
+
     private function get_manifest() {
         $cached = get_site_transient($this->cache_key);
         if (is_array($cached)) {
@@ -132,7 +156,7 @@ class AT_AI_Private_CDN_Updater {
             return false;
         }
 
-        set_site_transient($this->cache_key, $manifest, 6 * HOUR_IN_SECONDS);
+        set_site_transient($this->cache_key, $manifest, 15 * MINUTE_IN_SECONDS);
         return $manifest;
     }
 }
